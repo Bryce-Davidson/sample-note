@@ -1,6 +1,6 @@
 {
 	"name": "sample-note",
-	"version": "0.1.22",
+	"version": "0.1.23",
 	"description": "This is a sample plugin for Obsidian (https://obsidian.md)",
 	"type": "module",
 	"main": "main.js",
