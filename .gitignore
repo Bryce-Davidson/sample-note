@@ -1,5 +1,7 @@
 # vscode
 .vscode
+package-lock.json
+
 
 # Intellij
 *.iml
