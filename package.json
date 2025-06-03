@@ -32,7 +32,6 @@
 		"vite": "^5.2.2"
 	},
 	"dependencies": {
-		"@rollup/rollup-darwin-arm64": "^4.41.1",
 		"d3": "^7.9.0",
 		"diff": "^8.0.1",
 		"fabric": "^6.6.2",
