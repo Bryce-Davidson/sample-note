@@ -31,7 +31,7 @@ I hope you enjoy.
 
 1. **Download the plugin files**
 
-    - Go to the [Releases page](https://github.com/YOUR_USERNAME/sample-note/releases) on GitHub
+    - Go to the [Releases page](https://github.com/bryce-davidson/sample-note/releases) on GitHub
     - Download the latest release files (`main.js`, `manifest.json`, and `styles.css`)
 
 2. **Locate your Obsidian vault's plugins folder**
