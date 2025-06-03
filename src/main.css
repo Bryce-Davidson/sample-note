@@ -1,0 +1,125 @@
+:root {
+	--hidden-color: #00ffbf;
+}
+
+.sample-note-reset {
+	& button {
+		background: transparent;
+		border: none;
+		cursor: pointer;
+	}
+}
+
+.HyperMD-codeblock.cm-line {
+	background: none !important;
+	border: none !important;
+	box-shadow: none !important;
+	padding: 0 !important;
+	color: inherit !important;
+}
+
+.sample-note-hidable-element {
+	cursor: pointer;
+}
+
+.sample-note-hidable-element.sample-note-is-hidden a {
+	pointer-events: none;
+	cursor: pointer;
+}
+
+.sample-note-hidable-element.sample-note-is-hidden:has(img) {
+	position: relative;
+	display: inline-block;
+	cursor: pointer;
+}
+
+.sample-note-hidable-element.sample-note-is-hidden:has(img) img {
+	opacity: 0;
+}
+
+.sample-note-hidable-element.sample-note-is-hidden:has(img)::after {
+	content: "";
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: linear-gradient(
+		45deg,
+		var(--hidden-color) 0%,
+		var(--hidden-color) 100%
+	);
+	border-radius: inherit;
+	pointer-events: none;
+	z-index: 1;
+}
+
+.sample-note-is-hidden,
+.sample-note-is-hidden .MathJax {
+	color: transparent !important;
+	background-color: var(--hidden-color);
+	border-radius: 4px;
+	user-select: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	cursor: pointer;
+}
+
+.sample-note-hidable-element.sample-note-is-hidden a {
+	color: transparent !important;
+	background-color: var(--hidden-color) !important;
+	border-radius: 4px;
+	text-decoration: none !important;
+	user-select: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	cursor: pointer;
+}
+
+.sample-note-hidable-element.sample-note-is-hidden mark {
+	color: transparent !important;
+	background-color: var(--hidden-color) !important;
+	border-radius: 4px;
+	user-select: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	cursor: pointer;
+}
+
+/* ============================
+   Inline Math Container
+=============================== */
+.inline-math-container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap: 0.5em;
+	flex-wrap: wrap;
+}
+
+.inline-math-container .math-block {
+	display: inline-block;
+}
+
+/* ============================
+   MathJax Styling
+=============================== */
+.el-div {
+	overflow-x: auto;
+	max-width: 100%;
+}
+
+.math.math-block.is-loaded {
+	overflow-x: auto;
+	display: block;
+	white-space: nowrap;
+	max-width: 100%;
+}
+
+.mjx-container {
+	display: inline-block;
+	white-space: nowrap;
+}
