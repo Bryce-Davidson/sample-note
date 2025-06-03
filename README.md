@@ -25,6 +25,56 @@ I hope you enjoy.
     -   Context Controls
     -   Image-in-Chat Support
 
+## Installation
+
+### Installing from GitHub
+
+1. **Download the plugin files**
+
+    - Go to the [Releases page](https://github.com/YOUR_USERNAME/sample-note/releases) on GitHub
+    - Download the latest release files (`main.js`, `manifest.json`, and `styles.css`)
+
+2. **Locate your Obsidian vault's plugins folder**
+
+    - Open Obsidian and go to Settings → Community plugins
+    - Click on the folder icon next to "Installed plugins" to open your vault's plugins folder
+    - Alternatively, navigate to: `YourVault/.obsidian/plugins/`
+
+3. **Install the plugin**
+
+    - Create a new folder called `sample-note` in the plugins folder
+    - Copy the downloaded files (`main.js`, `manifest.json`, and `styles.css`) into this folder
+
+4. **Enable the plugin**
+    - Go back to Obsidian Settings → Community plugins
+    - Reload Obsidian or click the reload button
+    - Find "Sample Note Beta" in the list and toggle it on
+
+### Building from Source
+
+If you want to build the plugin from source:
+
+1. Clone the repository:
+
+    ```bash
+    git clone https://github.com/bryce-davidson/sample-note.git
+    cd sample-note
+    ```
+
+2. Install dependencies:
+
+    ```bash
+    npm install
+    ```
+
+3. Build the plugin:
+
+    ```bash
+    npm run build
+    ```
+
+4. Copy the built files (`main.js`, `manifest.json`, and `styles.css`) to your vault's plugins folder as described above.
+
 # Documentation
 
 ## Integrated Text Occlusion
