@@ -1,5 +1,7 @@
 ## Sample Note Beta (0.1.22)
 
+![cover](docs/images/cover-2.png)
+
 I've always loved Obsidian and have been a supporter from nearly the beginning, but I found it tedious to synchronize my notes with other forms of learning programs such as Anki, GoodNotes, etc.
 
 To remedy this, I've created a plugin to make Obsidian my single source of truth, where all forms of learning content will react and change with my notes as I create and edit them, rather than being an afterthought.
