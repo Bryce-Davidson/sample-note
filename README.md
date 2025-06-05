@@ -93,7 +93,7 @@ Wrap text in a `[hide][/hide]` element to hide the text.
 
 Click on the hidden text to reveal the text.
 
-Use hide blocks to hide inline math and block level math.
+Use hide blocks to hide both inline and block level math.
 
 ![inline-math-hide](docs/images/inline-math-hide.gif)
 
@@ -144,7 +144,7 @@ Enable the "Quick Add" option to add occlusions by dragging and releasing them t
 
 ## HideOne/Hide All
 
-With one or multiple occlusions occlusions selected, click on either "HideAll" or "HideOne" to create a flashcard which just contains the image and the selected occlusions.
+With one or multiple occlusions selected, click on either "HideAll" or "HideOne" to create a flashcard which just contains the image and the selected occlusions.
 
 -   HideAll
     -   Selected Occlusions will be able to be toggled, while all other occlusions will be permanant.
