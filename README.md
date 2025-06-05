@@ -1,6 +1,6 @@
 ## Sample Note Beta (0.1.22)
 
-![cover](docs/images/cover-3.png)
+![cover](docs/images/cover.png)
 
 I've always loved Obsidian and have been a supporter from nearly the beginning, but I found it tedious to synchronize my notes with other forms of learning programs such as Anki, GoodNotes, etc.
 
