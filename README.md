@@ -262,7 +262,7 @@ Select from one the most up to date OpenAI models.
 
 Use the context controls to control what chatGPT sees.
 
-![chat-assistant](docs/images/chat-assistant.png)
+![chat](docs/images/chat.gif)
 
 ### Demos
 
