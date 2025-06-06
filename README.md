@@ -96,8 +96,6 @@ Add occlusions to images in your vault using the occlusion editor.
 
 ### Occlusion Editor
 
-![occlusion-editor-example](docs/images/occlusion-editor-example.png)
-
 Double click on preview images to open them in the occlusion editor, or search and select them using the attachment search box.
 
 ### Preview Occlusions
@@ -180,7 +178,7 @@ Click on one of the five rating buttons to input your easyness-factor rating.
 
 Open the Flashcard Graph View to see the Easyness Factor (EF) rating for all flashcards in your connected notes.
 
-![graph-view](docs/images/graph-view.gif)
+![graph](docs/images/graph.gif)
 
 ### Controls
 
@@ -213,7 +211,7 @@ Use the controls to change the visual appearance of the graph and modify the ani
 
 Open the drawing editor using the pencil ribbon icon.
 
-![drawing](docs/images/drawing.gif)
+![draw](docs/images/draw.gif)
 
 Drawings are linked directly to notes, as indicated by the title preview of the associated tab.
 
