@@ -12,20 +12,25 @@ I hope you enjoy.
 
 ## Features
 
--   Integrated Text Occlusion
--   Integrated Image Occlusion
-    -   Occlusion Editor
--   Flashcards
-    -   Image Occlusion Flashcards
--   Flashcard Graph View
-    -   Animation Timeline
-    -   EF Rating Animations
--   Tablet Support for Handwritten Notes/Drawing
-    -   Stylus Support
-    -   Freehand Drawing
--   Chat Editor
-    -   Context Controls
-    -   Image-in-Chat Support
+## GoodNotes Style Handwriting
+
+![draw](docs/images/draw.gif)
+
+### Integrated Text Occlusion & Flashcards
+
+![flashcard](docs/images/flashcard.gif)
+
+## Integrated Image Occlusion
+
+![occlusion](docs/images/occlusions.gif)
+
+## Flashcard Graph
+
+![graph](docs/images/graph.gif)
+
+## Copilot Chat Assistant
+
+![chat](docs/images/chat.gif)
 
 ## Installation
 
@@ -51,31 +56,6 @@ I hope you enjoy.
     - Go back to Obsidian Settings → Community plugins
     - Reload Obsidian or click the reload button
     - Find "Sample Note Beta" in the list and toggle it on
-
-### Building from Source
-
-If you want to build the plugin from source:
-
-1. Clone the repository:
-
-    ```bash
-    git clone https://github.com/bryce-davidson/sample-note.git
-    cd sample-note
-    ```
-
-2. Install dependencies:
-
-    ```bash
-    npm install
-    ```
-
-3. Build the plugin:
-
-    ```bash
-    npm run build
-    ```
-
-4. Copy the built files (`main.js`, `manifest.json`, and `styles.css`) to your vault's plugins folder as described above.
 
 # Documentation
 
