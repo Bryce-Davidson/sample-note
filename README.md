@@ -114,8 +114,6 @@ Click on the "+" button to add an occlusion onto the image.
 
 Enable the "Quick Add" option to add occlusions by dragging and releasing them to add them onto the image.
 
-![occlusion-drag-add](docs/images/occlusion-drag-add.gif)
-
 ## HideOne/Hide All
 
 With one or multiple occlusions selected, click on either "HideAll" or "HideOne" to create a flashcard which just contains the image and the selected occlusions.
