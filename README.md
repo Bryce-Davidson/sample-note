@@ -104,8 +104,6 @@ Double click on preview images to open them in the occlusion editor, or search a
 
 Images with Occlusions which have been inserted as a preview using `![[]]` will appear with the occlusions added to the image in rendered markdown.
 
-![occlusion-previews](docs/images/occlusion-previews.png)
-
 Click on the small circular blue button in the bottom right of the image to enable revealing the occlusion shapes by clicking on them. The button will turn green indicating that the occlusions can be clicked to reveal the image behind them.
 
 Click on the now small circular green button to reset all occlusion shapes.
@@ -113,8 +111,6 @@ Click on the now small circular green button to reset all occlusion shapes.
 ### Adding Occlusions
 
 Click on the "+" button to add an occlusion onto the image.
-
-![occlusion-add-button](docs/images/occlusion-add-button.png)
 
 #### Quick Add Occlusion
 
