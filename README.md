@@ -14,25 +14,31 @@ I hope you enjoy.
 
 ## GoodNotes Style Handwriting
 
-Take handwritten notes in Obsidian using a similiar set of tools as GoodNotes.
+Transform your Obsidian notes with natural handwriting support, featuring a familiar and intuitive drawing interface inspired by GoodNotes. Perfect for tablet users and those who prefer handwritten notes.
 
 ![draw](docs/images/draw.gif)
 
 ### Integrated Text Occlusion & Flashcards
 
-Easily create flashcards directly within Obsidian your content without having to export or sync to Anki.
+Create and manage flashcards seamlessly within Obsidian, eliminating the need for external flashcard applications. Hide and reveal text to test your knowledge directly in your notes, or using the built in flashcard review tray.
 
 ![flashcard](docs/images/flashcard.gif)
 
 ## Integrated Image Occlusion
 
+Enhance your learning with interactive image occlusions. Create custom masks over images and review them as standalone flashcards, perfect for studying diagrams, maps, and visual concepts.
+
 ![occlusion](docs/images/occlusions.gif)
 
 ## Flashcard Graph
 
+View your flashcard progression in a native Obsidian-style knowledge graph that visualizes connections between concepts, helping you identify areas for improvement and prioritize reviews based on related topics.
+
 ![graph](docs/images/graph.gif)
 
 ## Copilot Chat Assistant
+
+Fill the context of ChatGPT with your noted to create, edit and ask questions of your notes. Generate practice tests, create flashcards, and get instant feedback on your learning materials, all within Obsidian.
 
 ![chat](docs/images/chat.gif)
 
