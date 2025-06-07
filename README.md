@@ -14,9 +14,13 @@ I hope you enjoy.
 
 ## GoodNotes Style Handwriting
 
+Take handwritten notes in Obsidian using a similiar set of tools as GoodNotes.
+
 ![draw](docs/images/draw.gif)
 
 ### Integrated Text Occlusion & Flashcards
+
+Easily create flashcards directly within Obsidian your content without having to export or sync to Anki.
 
 ![flashcard](docs/images/flashcard.gif)
 
