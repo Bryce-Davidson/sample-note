@@ -4,7 +4,7 @@
 
 I've always loved Obsidian and have been a supporter from nearly the beginning, but I found it tedious to synchronize my notes with other forms of learning programs such as Anki, GoodNotes, etc.
 
-To remedy this, I've created a plugin to make Obsidian my single source of truth by replicating my favourite features from all different kinds of learning tools.
+To remedy this, I've created a plugin to make Obsidian my single source of truth by replicating my favourite features from all different kinds of learning tools directly in Obsidian.
 
 I hope you enjoy.
 
@@ -24,85 +24,45 @@ Create and manage flashcards seamlessly within Obsidian, eliminating the need fo
 
 ![flashcard](docs/images/flashcard.gif)
 
+### Quick Access
+
+The following ribbon icons are available for quick access to flashcard features:
+
+-   **Layers Icon**: Review all due flashcards
+-   **Check Square Icon**: Review flashcards in the current note
+-   **Check Icon**: Review all flashcards
+-   **Eye/Eye-off Icon**: Toggle visibility of all hidden content
+-   **File Text Icon**: Open the review queue
+
+### Available Commands
+
+-   **Wrap Selected Text in [card][/card]**: Wraps the selected text or current line in flashcard tags
+-   **Delete [card][/card] wrappers**: Removes flashcard tags from the current selection
+-   **Delete all [card][/card] wrappers**: Removes all flashcard tags from the current note
+-   **Review Current Note**: Opens the flashcard review modal for the current note
+-   **Review All**: Opens the flashcard review modal for all due flashcards
+-   **Resync Flashcards in Current Note**: Resynchronizes flashcards in the current note
+-   **Synchronize All Cards in Vault**: Resynchronizes all flashcards across the vault
+
 ## Integrated Image Occlusion
 
 Enhance your learning with interactive image occlusions. Create custom masks over images and review them as standalone flashcards, perfect for studying diagrams, maps, and visual concepts.
 
 ![occlusion](docs/images/occlusions.gif)
 
-## Flashcard Graph
+### Quick Access
 
-View your flashcard progression in a native Obsidian-style knowledge graph that visualizes connections between concepts, helping you identify areas for improvement and prioritize reviews based on related topics.
+The following ribbon icon is available for quick access to the occlusion editor:
 
-![graph](docs/images/graph.gif)
+-   **Image File Icon**: Open the occlusion editor
 
-## Copilot Chat Assistant
+### Available Commands
 
-Fill the context of ChatGPT with your noted to create, edit and ask questions of your notes. Generate practice tests, create flashcards, and get instant feedback on your learning materials, all within Obsidian.
-
-![chat](docs/images/chat.gif)
-
-## Installation
-
-### Installing from GitHub
-
-1. **Download the plugin files**
-
-    - Go to the [Releases page](https://github.com/bryce-davidson/sample-note/releases) on GitHub
-    - Download the latest release files (`main.js`, `manifest.json`, and `styles.css`)
-
-2. **Locate your Obsidian vault's plugins folder**
-
-    - Open Obsidian and go to Settings → Community plugins
-    - Click on the folder icon next to "Installed plugins" to open your vault's plugins folder
-    - Alternatively, navigate to: `YourVault/.obsidian/plugins/`
-
-3. **Install the plugin**
-
-    - Create a new folder called `sample-note` in the plugins folder
-    - Copy the downloaded files (`main.js`, `manifest.json`, and `styles.css`) into this folder
-
-4. **Enable the plugin**
-    - Go back to Obsidian Settings → Community plugins
-    - Reload Obsidian or click the reload button
-    - Find "Sample Note Beta" in the list and toggle it on
-
-# Documentation
-
-## Integrated Text Occlusion
-
-### Motivation
-
-> When I read my notes, I actually don't want to see everything. This way I know I'm never reading something without actually reviewing it.
-
-## Feature
-
-Wrap text in a `[hide][/hide]` element to hide the text.
-
-![text-hide](docs/images/text-hide.gif)
-
-Click on the hidden text to reveal the text.
-
-Use hide blocks to hide both inline and block level math.
-
-![inline-math-hide](docs/images/inline-math-hide.gif)
-
-![math-hide](docs/images/math-hide.gif)
-
-### Hide Groups
-
-Use hide groups to synchronize show/hide functionality across different hide blocks by assigning a **numerical** id to the hide block:
-
-```markdown
--   This is a sentence which [hide=1]contains[/hide] a hide block with a group id.
--   This is a second sentence which [hide=1]contains[/hide] a hide block with the same group id.
-```
-
-![text-hide-groups](docs/images/text-hide-groups.gif)
-
-## Image Occlusion
-
-Add occlusions to images in your vault using the occlusion editor.
+-   **Wrap Selected Text in [hide][/hide]**: Wraps the selected text or current line in hide tags
+-   **Wrap in multiline hide [hide][/hide]**: Wraps the selected text or current line in a multiline hide block
+-   **Delete [hide][/hide] wrappers**: Removes hide tags from the current selection
+-   **Toggle All Hidden Content**: Shows or hides all hidden content in the current note
+-   **Open Occlusion Editor**: Opens the image occlusion editor
 
 ### Occlusion Editor
 
@@ -155,8 +115,6 @@ Flashcards appear in the [hide]"Review Queue"[/hide]
 
 Open the review queue using the "Review Queue" ribbon icon to see all flashcards within your vault.
 
-![review-queue](docs/images/review-queue.png)
-
 Flashcards in the Review Queue are scheduled using the same SM-2 algorithm used in Anki.
 
 #### Filter Options
@@ -176,17 +134,14 @@ Upon clicking on the review button in the "Review Queue", flashcards will appear
 
 Click on one of the five rating buttons to input your easyness-factor rating.
 
-![flashcard-modal](docs/images/flashcard-modal.png)
-
-## Desired Features
-
--   Front/Back Style Cards
-
 ## Flashcard Graph View
 
 Open the Flashcard Graph View to see the Easyness Factor (EF) rating for all flashcards in your connected notes.
 
-![graph](docs/images/graph.gif)
+### Available Commands
+
+-   **Open Graph View**: Opens the flashcard graph visualization
+-   **Open Unified Queue**: Opens the review queue sidebar
 
 ### Controls
 
@@ -219,11 +174,19 @@ Use the controls to change the visual appearance of the graph and modify the ani
 
 Open the drawing editor using the pencil ribbon icon.
 
-![draw](docs/images/draw.gif)
-
 Drawings are linked directly to notes, as indicated by the title preview of the associated tab.
 
 Drawing view can be toggled to be either in the sidebar or a main view by using the associated control.
+
+### Quick Access
+
+The following ribbon icon is available for quick access to the drawing canvas:
+
+-   **Pencil Icon**: Open the drawing canvas
+
+### Available Commands
+
+-   **Open Drawing Canvas**: Opens the drawing canvas
 
 ### Controls
 
@@ -257,10 +220,13 @@ Drawing view can be toggled to be either in the sidebar or a main view by using 
 -   Toggle Sidebar/Main View
 -   Clear Canvas
 
-### Desired Features
+## Math Support
 
--   Lined pages
--   Obsidian native links
+The plugin includes special support for mathematical content, making it easier to create flashcards from mathematical equations and formulas.
+
+### Available Commands
+
+-   **Split Math Block on Equals Sign**: Splits a math block at the equals sign to create a flashcard
 
 ## Chat Assistant
 
@@ -270,7 +236,15 @@ Select from one the most up to date OpenAI models.
 
 Use the context controls to control what chatGPT sees.
 
-![chat](docs/images/chat.gif)
+### Quick Access
+
+The following ribbon icon is available for quick access to the chat assistant:
+
+-   **Message Square Icon**: Open the chat assistant
+
+### Available Commands
+
+-   **Open Chat Assistant**: Opens the AI chat assistant
 
 ### Demos
 
@@ -278,7 +252,42 @@ Use the context controls to control what chatGPT sees.
 -   Make me a new flashcard on this material
 -   grade my practice test
 
-## Desired Features
+## Copilot Chat Assistant
+
+Fill the context of ChatGPT with your noted to create, edit and ask questions of your notes. Generate practice tests, create flashcards, and get instant feedback on your learning materials, all within Obsidian.
+
+![chat](docs/images/chat.gif)
+
+### Quick Access
+
+The following ribbon icon is available for quick access to the chat assistant:
+
+-   **Message Square Icon**: Open the chat assistant
+
+### Available Commands
+
+-   **Open Chat Assistant**: Opens the AI chat assistant
+
+### Demos
+
+-   make me a practice test on this material
+-   Make me a new flashcard on this material
+-   grade my practice test
+
+# Road Map
+
+The following features are planned for future releases:
+
+## Flashcard Features
+
+-   Front/Back Style Cards
+
+## Drawing Features
+
+-   Lined pages
+-   Obsidian native links
+
+## Chat Assistant Features
 
 -   Drawing view integration
 -   Prompt Basket Buttons
