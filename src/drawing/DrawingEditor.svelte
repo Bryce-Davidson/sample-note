@@ -404,11 +404,9 @@
 
 <div class="root">
 	<!-- Toolbar with improved responsive design - Single row with logical groups -->
-	<div
-		class="flex flex-wrap items-center gap-3 px-3 py-2 !border-b !border-gray-200 bg-white/90 dark:!border-gray-700 dark:bg-gray-800/90 backdrop-blur-sm sample-note-reset"
-	>
+	<div class="toolbar">
 		<!-- Group 1: Drawing Tools - Most important and frequently used -->
-		<div class="flex flex-wrap items-center gap-2 p-0.5 sm:p-1">
+		<div class="tool-group">
 			{#if canvas}
 				<ToolManager
 					bind:this={toolManagerRef}
@@ -426,18 +424,12 @@
 		</div>
 
 		<!-- Group 2: Background Color -->
-		<div class="flex items-center p-0.5 sm:p-1 ml-auto sm:ml-0">
-			<div
-				class="!p-1.5 !rounded-lg !flex !items-center !justify-center !text-gray-500 dark:!text-gray-400 !border !border-transparent !shadow-none !bg-transparent"
-				title="Change Background Color"
-			>
-				<div
-					class="w-5 h-5 !border !border-gray-300 rounded dark:!border-gray-600"
-					bind:this={bgColorPreview}
-				></div>
+		<div class="background-color-group">
+			<div class="color-picker-button" title="Change Background Color">
+				<div class="color-preview" bind:this={bgColorPreview}></div>
 				<input
 					type="color"
-					class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+					class="color-input"
 					value="#ffffff"
 					bind:this={bgColorInput}
 				/>
@@ -445,14 +437,11 @@
 		</div>
 
 		<!-- Group 3: Edit Controls -->
-		<div
-			class="flex flex-wrap items-center gap-1 p-0.5 sm:p-1 border-l border-gray-200 dark:border-gray-700 pl-2 sm:pl-3"
-			bind:this={editControlsGroup}
-		>
+		<div class="edit-controls-group" bind:this={editControlsGroup}>
 			<!-- Save Button -->
 			<button
 				type="button"
-				class="!p-1.5 !rounded-lg !flex !items-center !justify-center !text-gray-500 dark:!text-gray-400 !border !border-transparent !shadow-none !bg-transparent"
+				class="toolbar-button"
 				title={saveButton.title}
 				on:click={saveCurrentDrawing}
 				data-plugin="sample-note"
@@ -460,7 +449,7 @@
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
 					viewBox="0 0 24 24"
-					class="!w-4 !h-4"
+					class="toolbar-icon"
 					fill="none"
 					stroke="currentColor"
 					stroke-width="2"
@@ -475,7 +464,7 @@
 			{#each editControls as control}
 				<button
 					type="button"
-					class="!p-1.5 !rounded-lg !flex !items-center !justify-center !text-gray-500 dark:!text-gray-400 !border !border-transparent !shadow-none !bg-transparent"
+					class="toolbar-button"
 					title={control.title}
 					on:click={control.action}
 					data-plugin="sample-note"
@@ -483,7 +472,7 @@
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
 						viewBox="0 0 24 24"
-						class="!w-4 !h-4"
+						class="toolbar-icon"
 						fill="none"
 						stroke="currentColor"
 						stroke-width="2"
@@ -497,13 +486,11 @@
 		</div>
 
 		<!-- Group 4: Layout/View Controls -->
-		<div
-			class="flex items-center p-0.5 sm:p-1 border-l border-gray-200 dark:border-gray-700 pl-2 sm:pl-3"
-		>
+		<div class="layout-controls-group">
 			<!-- Toggle button for sidebar/main area -->
 			<button
 				type="button"
-				class="!p-1.5 !rounded-lg !flex !items-center !justify-center !text-gray-500 dark:!text-gray-400 !border !border-transparent !shadow-none !bg-transparent"
+				class="toolbar-button"
 				title={isInSidebar() ? "Open in Main Area" : "Open in Sidebar"}
 				on:click={() =>
 					isInSidebar()
@@ -514,7 +501,7 @@
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
 					viewBox="0 0 512 512"
-					class="!w-4 !h-4"
+					class="toolbar-icon"
 					fill="currentColor"
 					aria-hidden="true"
 					focusable="false"
@@ -529,13 +516,11 @@
 		</div>
 
 		<!-- Group 5: Destructive Actions -->
-		<div
-			class="flex items-center p-0.5 sm:p-1 border-l border-gray-200 dark:border-gray-700 pl-2 sm:pl-3"
-		>
+		<div class="destructive-actions-group">
 			<!-- Clear Button -->
 			<button
 				type="button"
-				class="!p-1.5 !rounded-lg !flex !items-center !justify-center !text-red-500 dark:!text-red-400 !border !border-transparent !shadow-none !bg-transparent"
+				class="toolbar-button clear-button"
 				title={clearButton.title}
 				on:click={clearButton.action}
 				data-plugin="sample-note"
@@ -543,7 +528,7 @@
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
 					viewBox="0 0 24 24"
-					class="!w-4 !h-4"
+					class="toolbar-icon"
 					fill="none"
 					stroke="currentColor"
 					stroke-width="2"
@@ -559,13 +544,77 @@
 	<div class="canvas-container" bind:this={canvasContainer}></div>
 </div>
 
-<style>
+<style lang="postcss">
 	.root {
 		display: flex;
 		flex-direction: column;
 		height: 100%;
 		width: 100%;
 	}
+
+	.toolbar {
+		@apply flex flex-wrap items-center gap-3 px-3 py-2;
+		@apply border-b border-gray-200 dark:border-gray-700;
+		@apply bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm;
+	}
+
+	.tool-group {
+		@apply flex flex-wrap items-center gap-2 p-0.5 sm:p-1;
+	}
+
+	.background-color-group {
+		@apply flex items-center p-0.5 sm:p-1 ml-auto sm:ml-0;
+	}
+
+	.color-picker-button {
+		@apply p-1.5 rounded-lg flex items-center justify-center;
+		@apply text-gray-500 dark:text-gray-400;
+		@apply border border-transparent shadow-none bg-transparent;
+		@apply relative;
+	}
+
+	.color-preview {
+		@apply w-5 h-5 border border-gray-300 dark:border-gray-600 rounded;
+	}
+
+	.color-input {
+		@apply absolute inset-0 w-full h-full opacity-0 cursor-pointer;
+	}
+
+	.edit-controls-group {
+		@apply flex flex-wrap items-center gap-1 p-0.5 sm:p-1;
+		@apply border-l border-gray-200 dark:border-gray-700 pl-2 sm:pl-3;
+	}
+
+	.layout-controls-group {
+		@apply flex items-center p-0.5 sm:p-1;
+		@apply border-l border-gray-200 dark:border-gray-700 pl-2 sm:pl-3;
+	}
+
+	.destructive-actions-group {
+		@apply flex items-center p-0.5 sm:p-1;
+		@apply border-l border-gray-200 dark:border-gray-700 pl-2 sm:pl-3;
+	}
+
+	.toolbar-button {
+		@apply p-1.5 rounded-lg flex items-center justify-center;
+		@apply text-gray-500 dark:text-gray-400;
+		@apply border border-transparent shadow-none bg-transparent;
+		@apply transition-colors duration-150;
+	}
+
+	.toolbar-button:hover {
+		@apply bg-gray-100 dark:bg-gray-700;
+	}
+
+	.toolbar-button.clear-button {
+		@apply text-red-500 dark:text-red-400;
+	}
+
+	.toolbar-icon {
+		@apply w-4 h-4;
+	}
+
 	.canvas-container {
 		flex: 1;
 		position: relative;
