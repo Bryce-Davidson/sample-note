@@ -3,8 +3,8 @@
 	"name": "Sample Note",
 	"version": "0.1.25",
 	"minAppVersion": "0.15.0",
-	"description": "A plugin that integrates text/image occlusion, flashcards with spaced repetition, handwritten notes/drawing support, and a chat assistant to make Obsidian your single source of truth for learning",
-	"author": "Obsidian",
+	"description": "A plugin that integrates text/image occlusion, flashcards with spaced repetition, handwritten notes/drawing support, and a chat assistant to make your single source of truth for learning",
+	"author": "Bryce Davidson",
 	"authorUrl": "https://buymeacoffee.com/datanoteable",
 	"fundingUrl": "https://buymeacoffee.com/datanoteable",
 	"isDesktopOnly": false
