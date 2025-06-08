@@ -1,6 +1,7 @@
 # vscode
 .vscode
 package-lock.json
+sync.sh
 
 
 # Intellij
