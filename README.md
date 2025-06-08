@@ -1,6 +1,6 @@
 <div align="center">
 
-# Sample Note Beta
+# Sample Note Beta (v0.1.26)
 
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/bryce-davidson/sample-note?label=version)](https://github.com/bryce-davidson/sample-note/releases)
 

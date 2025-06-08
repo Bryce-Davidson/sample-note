@@ -7,7 +7,7 @@
 	"scripts": {
 		"dev": "vite build --watch --mode development",
 		"build": "vite build",
-		"version": "node version-bump.mjs && git add manifest.json versions.json",
+		"version": "node version-bump.mjs && node update-readme-version.mjs && git add manifest.json versions.json README.md",
 		"sync": "chmod +x sync.sh && ./sync.sh",
 		"release": "npm version patch && git push && git push --tags"
 	},
