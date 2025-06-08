@@ -8,6 +8,8 @@
 
 <a href="https://buymeacoffee.com/datanoteable" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
 
+_The Obsidian community has been an incredible source of inspiration and support throughout this journey. Your enthusiasm, feedback, and shared passion for knowledge management have made developing this plugin an absolute joy. Every donation, no matter how small, helps me dedicate more time to improving Sample Note and creating features that make our collective learning experience even better. Thank you for being part of this amazing community. Together, we're building something truly special. 💜_
+
 ![cover](docs/images/cover.gif)
 
 </div>
