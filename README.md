@@ -2,13 +2,13 @@
 
 # Sample Note Beta
 
-![cover](docs/images/cover.gif)
-
-[![Version](https://img.shields.io/badge/version-0.1.26-blue.svg)](https://github.com/bryce-davidson/sample-note/releases)
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/bryce-davidson/sample-note?label=version)](https://github.com/bryce-davidson/sample-note/releases)
 
 **[Features](#features)** • **[Installation](#installation)** • **[Documentation](#documentation)** • **[Support](#support)**
 
 <a href="https://buymeacoffee.com/datanoteable" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
+
+![cover](docs/images/cover.gif)
 
 </div>
 
