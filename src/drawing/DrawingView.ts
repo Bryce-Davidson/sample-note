@@ -1,7 +1,6 @@
 import { ItemView, WorkspaceLeaf, Notice } from "obsidian";
 import DrawingRoot from "./DrawingEditor.svelte";
 import { App } from "obsidian";
-import { getSharedStyles } from "../vite";
 
 export class DrawingCanvasView extends ItemView {
 	private component: DrawingRoot | null = null;
@@ -221,10 +220,6 @@ export class DrawingCanvasView extends ItemView {
 		if (targetEl instanceof HTMLElement) {
 			targetEl.empty();
 			targetEl.addClass("drawing-canvas-view");
-
-			const styleEl = document.createElement("style");
-			styleEl.textContent = getSharedStyles();
-			targetEl.appendChild(styleEl);
 		} else {
 			console.error(
 				"DrawingView: Target element not found or not an HTMLElement during rebuild."

@@ -421,17 +421,14 @@
 	}
 </script>
 
-<div class="sample-note-reset">
-	<div
-		class="flex flex-wrap items-center gap-2 sm:gap-4 md:gap-6 lg:gap-10 !p-1"
-	>
-		<div class="flex flex-wrap gap-1 sm:gap-2 md:gap-4 !p-0.5">
+<div class="tool-manager-container sample-note-reset">
+	<div class="tool-manager-wrapper">
+		<div class="tool-buttons-group">
 			{#each tools as tool}
 				<button
-					class="!p-1.5 !rounded-lg !flex !items-center !justify-center {$activeTool ===
-					tool.type
-						? 'active-tool !text-gray-900 dark:!text-white !bg-blue-100 dark:!bg-blue-900/30 !outline !outline-2 !outline-blue-500 !outline-offset-1'
-						: '!text-gray-500 dark:!text-gray-400 !border !border-transparent'} !shadow-none"
+					class="tool-button {$activeTool === tool.type
+						? 'tool-button-active'
+						: ''}"
 					on:click={() => setActiveTool(tool.type)}
 					aria-label={tool.title}
 					aria-pressed={$activeTool === tool.type}
@@ -442,7 +439,7 @@
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
 						viewBox="0 0 576 512"
-						class="!w-4 !h-4"
+						class="tool-icon"
 						fill="currentColor"
 						aria-hidden="true"
 						focusable="false"
@@ -454,18 +451,15 @@
 		</div>
 
 		<div
-			class="flex flex-wrap gap-1 sm:gap-2"
+			class="size-controls-group"
 			role="group"
 			aria-label="Brush size controls"
 		>
 			{#each sizes as size}
 				<button
-					class="!p-1.5 !rounded-lg !flex !items-center !justify-center {$activeSize.name ===
-					size.name
-						? 'active-tool !text-gray-900 dark:!text-white !bg-blue-100 dark:!bg-blue-900/30 !outline !outline-2 !outline-blue-500 !outline-offset-1'
-						: '!text-gray-500 dark:!text-gray-400 !border !border-transparent'} {!$allowSizeChange
-						? 'opacity-50 cursor-not-allowed'
-						: 'cursor-pointer'} !w-8 !h-8 !shadow-none"
+					class="size-button {$activeSize.name === size.name
+						? 'size-button-active'
+						: ''} {!$allowSizeChange ? 'disabled' : ''}"
 					on:click={() => setActiveSize(size)}
 					disabled={!$allowSizeChange}
 					aria-label={size.title}
@@ -474,7 +468,7 @@
 					title={size.title}
 				>
 					<div
-						class="flex-shrink-0 bg-current rounded-full"
+						class="size-indicator"
 						style="width: {size.width}px; height: {size.width}px;"
 					></div>
 				</button>
@@ -482,18 +476,15 @@
 		</div>
 
 		<div
-			class="flex flex-wrap items-center gap-1 sm:gap-2 {!$allowColorChange
-				? 'opacity-50 cursor-not-allowed pointer-events-none'
-				: ''}"
+			class="color-controls-group {!$allowColorChange ? 'disabled' : ''}"
 			role="region"
 			aria-label="Color selection"
 		>
-			<div class="flex items-center gap-1 sm:gap-1.5 mr-1 sm:mr-2">
+			<div class="default-colors-group">
 				{#each defaultColors as color}
 					<button
-						class="!w-5 !h-5 !rounded-full !border-0 !flex !items-center !justify-center {$activeColor ===
-						color.value
-							? '!outline !outline-2 !outline-blue-500 !outline-offset-1'
+						class="color-button {$activeColor === color.value
+							? 'color-button-active'
 							: ''}"
 						style="background-color: {color.value};"
 						on:click={() => setColor(color.value)}
@@ -507,13 +498,13 @@
 			</div>
 
 			<button
-				class="relative !w-5 !h-5 !rounded-full !border-0 !flex !items-center !justify-center !cursor-pointer {$activeColor !==
+				class="custom-color-button {$activeColor !==
 					defaultColors[0].value &&
 				$activeColor !== defaultColors[1].value &&
 				$activeColor !== defaultColors[2].value
-					? '!outline !outline-2 !outline-blue-500 !outline-offset-1'
+					? 'custom-color-active'
 					: ''}"
-				style="background-color: {$activeColor}; cursor: pointer !important;"
+				style="background-color: {$activeColor};"
 				type="button"
 				aria-label="Select custom color"
 			>
@@ -522,21 +513,19 @@
 					bind:value={$activeColor}
 					on:change={() => setColor($activeColor)}
 					disabled={!$allowColorChange}
-					class="absolute inset-0 z-10 w-full h-full opacity-0"
-					style="cursor: pointer !important;"
+					class="color-input"
 					aria-label="Select custom color"
 				/>
 			</button>
 		</div>
 
 		<!-- Tool Buttons -->
-		<div class="flex flex-wrap items-center gap-1 sm:gap-2">
+		<div class="utility-buttons-group">
 			<!-- Pan Tool Button -->
 			<button
-				class="!p-1.5 !rounded-lg !flex !items-center !justify-center {$activeTool ===
-				ToolType.Pan
-					? 'active-tool !text-gray-900 dark:!text-white !bg-blue-100 dark:!bg-blue-900/30 !outline !outline-2 !outline-blue-500 !outline-offset-1'
-					: '!text-gray-500 dark:!text-gray-400 !border !border-transparent'} !shadow-none"
+				class="tool-button {$activeTool === ToolType.Pan
+					? 'tool-button-active'
+					: ''}"
 				on:click={() => togglePan()}
 				aria-label="Pan Tool"
 				aria-pressed={$activeTool === ToolType.Pan}
@@ -547,7 +536,7 @@
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
 					viewBox="0 0 512 512"
-					class="!w-4 !h-4"
+					class="tool-icon"
 					fill="currentColor"
 					aria-hidden="true"
 					focusable="false"
@@ -560,9 +549,9 @@
 
 			<!-- Stylus-Only Mode Button -->
 			<button
-				class="!p-1.5 !rounded-lg !flex !items-center !justify-center {$stylusOnlyMode
-					? 'active-tool !text-gray-900 dark:!text-white !bg-blue-100 dark:!bg-blue-900/30 !outline !outline-2 !outline-blue-500 !outline-offset-1'
-					: '!text-gray-500 dark:!text-gray-400 !border !border-transparent'} !shadow-none"
+				class="tool-button {$stylusOnlyMode
+					? 'tool-button-active'
+					: ''}"
 				on:click={toggleStylusOnlyMode}
 				aria-label="Stylus-Only Mode"
 				aria-pressed={$stylusOnlyMode}
@@ -572,7 +561,7 @@
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
 					viewBox="0 0 512 512"
-					class="!w-4 !h-4"
+					class="tool-icon"
 					fill="currentColor"
 					aria-hidden="true"
 					focusable="false"
@@ -586,7 +575,7 @@
 			<!-- Delete Selection Button - Only visible when there's an active selection -->
 			{#if $activeSelection}
 				<button
-					class="!p-1.5 !rounded-lg !flex !items-center !justify-center !text-gray-500 dark:!text-gray-400 !border-0 !bg-transparent !shadow-none !outline-none"
+					class="tool-button delete-button"
 					on:click={deleteSelection}
 					aria-label="Delete Selection"
 					type="button"
@@ -595,7 +584,7 @@
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
 						viewBox="0 0 448 512"
-						class="!w-4 !h-4"
+						class="tool-icon"
 						fill="currentColor"
 						aria-hidden="true"
 						focusable="false"
@@ -609,3 +598,127 @@
 		</div>
 	</div>
 </div>
+
+<style lang="postcss">
+	.tool-manager-container {
+		/* Reset any inherited styles */
+	}
+
+	.tool-manager-wrapper {
+		@apply flex flex-wrap items-center gap-2 sm:gap-4 md:gap-6 lg:gap-10 p-1;
+	}
+
+	.tool-buttons-group {
+		@apply flex flex-wrap gap-1 sm:gap-2 md:gap-4 p-0.5;
+	}
+
+	.tool-button {
+		@apply p-1.5 rounded-lg flex items-center justify-center;
+		@apply text-gray-500 dark:text-gray-400;
+		@apply border border-transparent shadow-none;
+		@apply transition-colors duration-150;
+	}
+
+	.tool-button:hover {
+		@apply bg-gray-100 dark:bg-gray-700;
+	}
+
+	.tool-button-active {
+		@apply text-gray-900 dark:text-white;
+		@apply bg-blue-100 dark:bg-blue-900/30;
+		@apply outline outline-2 outline-blue-500 outline-offset-1;
+	}
+
+	.tool-icon {
+		@apply w-4 h-4;
+	}
+
+	.size-controls-group {
+		@apply flex flex-wrap gap-1 sm:gap-2;
+	}
+
+	.size-button {
+		@apply p-1.5 rounded-lg flex items-center justify-center;
+		@apply text-gray-500 dark:text-gray-400;
+		@apply border border-transparent shadow-none;
+		@apply w-8 h-8;
+		@apply cursor-pointer transition-colors duration-150;
+	}
+
+	.size-button:hover:not(.disabled) {
+		@apply bg-gray-100 dark:bg-gray-700;
+	}
+
+	.size-button-active {
+		@apply text-gray-900 dark:text-white;
+		@apply bg-blue-100 dark:bg-blue-900/30;
+		@apply outline outline-2 outline-blue-500 outline-offset-1;
+	}
+
+	.size-button.disabled {
+		@apply opacity-50 cursor-not-allowed;
+	}
+
+	.size-indicator {
+		@apply flex-shrink-0 bg-current rounded-full;
+	}
+
+	.color-controls-group {
+		@apply flex flex-wrap items-center gap-1 sm:gap-2;
+	}
+
+	.color-controls-group.disabled {
+		@apply opacity-50 cursor-not-allowed pointer-events-none;
+	}
+
+	.default-colors-group {
+		@apply flex items-center gap-1 sm:gap-1.5 mr-1 sm:mr-2;
+	}
+
+	.color-button {
+		@apply w-5 h-5 rounded-full border-0 flex items-center justify-center;
+		@apply transition-all duration-150;
+	}
+
+	.color-button:hover {
+		@apply scale-110;
+	}
+
+	.color-button-active {
+		@apply outline outline-2 outline-blue-500 outline-offset-1;
+	}
+
+	.custom-color-button {
+		@apply relative w-5 h-5 rounded-full border-0;
+		@apply flex items-center justify-center cursor-pointer;
+		@apply transition-all duration-150;
+	}
+
+	.custom-color-button:hover {
+		@apply scale-110;
+	}
+
+	.custom-color-active {
+		@apply outline outline-2 outline-blue-500 outline-offset-1;
+	}
+
+	.color-input {
+		@apply absolute inset-0 z-10 w-full h-full opacity-0;
+		cursor: pointer !important;
+	}
+
+	.utility-buttons-group {
+		@apply flex flex-wrap items-center gap-1 sm:gap-2;
+	}
+
+	.delete-button {
+		@apply text-gray-500 dark:text-gray-400;
+		@apply bg-transparent;
+		@apply outline-none;
+	}
+
+	.delete-button:hover {
+		@apply text-red-500 dark:text-red-400;
+		@apply bg-red-50 dark:bg-red-900/20;
+	}
+</style>
