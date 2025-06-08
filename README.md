@@ -4,7 +4,7 @@
 
 I've always loved Obsidian and have been a supporter from nearly the beginning, but I found it tedious to synchronize my notes with other forms of learning programs such as Anki, GoodNotes, etc.
 
-To remedy this, I've created a plugin to make Obsidian my single source of truth by replicating my favourite features from all different kinds of learning tools.
+To remedy this, I've created a plugin to make Obsidian my single source of truth by replicating my favourite features from all different kinds of learning tools within Obsidian.
 
 I hope you enjoy.
 
@@ -14,25 +14,31 @@ I hope you enjoy.
 
 ## GoodNotes Style Handwriting
 
-Take handwritten notes in Obsidian using a similiar set of tools as GoodNotes.
+Keep handrwitten notes directly in Obsidian using the GoodNotes style drawing editor.
 
 ![draw](docs/images/draw.gif)
 
 ### Integrated Text Occlusion & Flashcards
 
-Easily create flashcards directly within Obsidian your content without having to export or sync to Anki.
+Create and review flashcards without needing to worry about syncing them leaving them app. Use Obsidian as your single source of truth.
 
 ![flashcard](docs/images/flashcard.gif)
 
 ## Integrated Image Occlusion
 
+Create, preview, and review image occlusions directly within Obsidian bot within your notes as you read them and as flashcards.
+
 ![occlusion](docs/images/occlusions.gif)
 
 ## Flashcard Graph
 
+Track your learning progress with the interactive flashcard graph to visualize your study patterns. The graph animates and highlights flashcards whichb need improvement while showing the relationships between different cards. This visualization helps you optimize your study sessions by focusing on the cards that need the most attention.
+
 ![graph](docs/images/graph.gif)
 
 ## Copilot Chat Assistant
+
+Select the context for the model and ask the assistant to create notes, make flashcards, or explain concepts; or anything else.
 
 ![chat](docs/images/chat.gif)
 
@@ -144,135 +150,3 @@ Create flashcards by wrapping content within a card element.
 Flashcards appear in the [hide]"Review Queue"[/hide]
 [/card]
 ```
-
-## Review Queue
-
-Open the review queue using the "Review Queue" ribbon icon to see all flashcards within your vault.
-
-![review-queue](docs/images/review-queue.png)
-
-Flashcards in the Review Queue are scheduled using the same SM-2 algorithm used in Anki.
-
-#### Filter Options
-
--   Due
-    -   Shows all due flashcards
--   Scheduled
-    -   Shows all upcoming flashcards which are not due
--   Note
-    -   Shows all flashcards in current note
--   All Cards
-    -   Shows all flashcards
-
-### Flashcard Modal
-
-Upon clicking on the review button in the "Review Queue", flashcards will appear in the flashcard modal.
-
-Click on one of the five rating buttons to input your easyness-factor rating.
-
-![flashcard-modal](docs/images/flashcard-modal.png)
-
-## Desired Features
-
--   Front/Back Style Cards
-
-## Flashcard Graph View
-
-Open the Flashcard Graph View to see the Easyness Factor (EF) rating for all flashcards in your connected notes.
-
-![graph](docs/images/graph.gif)
-
-### Controls
-
-Use the controls to change the visual appearance of the graph and modify the animation.
-
-#### Graph Controls
-
--   Edge
--   Charge
--   Card Offset Distance
--   Card Size
--   Text Color
-
-#### Animation Controls
-
--   Play/Pause
--   Start/End
--   Click on the timeline to track to a location
--   Speed of animation
--   Group by events by specific time intervals
-
-#### Animation Grouping
-
--   None
--   Hour
--   Day
--   Week
-
-## Drawings/Hand Written Notes
-
-Open the drawing editor using the pencil ribbon icon.
-
-![draw](docs/images/draw.gif)
-
-Drawings are linked directly to notes, as indicated by the title preview of the associated tab.
-
-Drawing view can be toggled to be either in the sidebar or a main view by using the associated control.
-
-### Controls
-
-#### Tools
-
-##### Drawing Tools
-
--   Pen Brush
--   Handwriting Brush
--   Eraser Brush
--   Highlighter Brush
--   Freehand Selection Brush
--   Size Select
--   Color Select
-
-#### Canvas Modes/Controls
-
-##### Modes
-
--   Pan Mode
--   Stylus Only Mode (Excellent for when on a tablet)
-
-##### Controls
-
--   Background Color Select
--   Save Button
--   Return to Home View Button
--   Undo Button
--   Redo Button
--   Set Home View Button
--   Toggle Sidebar/Main View
--   Clear Canvas
-
-### Desired Features
-
--   Lined pages
--   Obsidian native links
-
-## Chat Assistant
-
-Use the chat editor to interact with your documents, and accomplish tasks such as creating new notes. Ask questions based on the context provided to the chat assistant.
-
-Select from one the most up to date OpenAI models.
-
-Use the context controls to control what chatGPT sees.
-
-![chat](docs/images/chat.gif)
-
-### Demos
-
--   make me a practice test on this material
--   Make me a new flashcard on this material
--   grade my practice test
-
-## Desired Features
-
--   Drawing view integration
--   Prompt Basket Buttons
