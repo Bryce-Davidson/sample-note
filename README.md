@@ -4,7 +4,7 @@
 
 ![cover](docs/images/cover.gif)
 
-[![Version](https://img.shields.io/badge/version-0.1.25-blue.svg)](https://github.com/bryce-davidson/sample-note/releases)
+[![Version](https://img.shields.io/badge/version-0.1.26-blue.svg)](https://github.com/bryce-davidson/sample-note/releases)
 
 **[Features](#features)** • **[Installation](#installation)** • **[Documentation](#documentation)** • **[Support](#support)**
 
@@ -82,6 +82,32 @@ Select the context for the model and ask the assistant to create notes, make fla
     - Go back to Obsidian Settings → Community plugins
     - Reload Obsidian or click the reload button
     - Find "Sample Note Beta" in the list and toggle it on
+
+### Installing using BRAT
+
+[BRAT](https://github.com/TfTHacker/obsidian42-brat) (Beta Reviewers Auto-update Tool) is a plugin that makes it easy to install and test beta plugins directly from GitHub.
+
+1. **Install BRAT**
+
+    - Open Obsidian Settings → Community plugins
+    - Click "Browse" and search for "BRAT"
+    - Install and enable the BRAT plugin
+
+2. **Add Sample Note Beta to BRAT**
+
+    - Open the Command Palette (Cmd/Ctrl + P)
+    - Run the command: `BRAT: Add a beta plugin for testing`
+    - Enter the GitHub repository URL: `https://github.com/bryce-davidson/sample-note`
+    - Click "Add Plugin"
+
+3. **Enable the plugin**
+
+    - After BRAT confirms the installation, go to Settings → Community plugins
+    - Find "Sample Note Beta" in the list and toggle it on
+
+4. **Updating the plugin**
+    - To check for updates, run the command: `BRAT: Check for updates to all beta plugins and UPDATE`
+    - You can also enable auto-updates in BRAT settings to automatically update beta plugins when Obsidian starts
 
 # Documentation
 
