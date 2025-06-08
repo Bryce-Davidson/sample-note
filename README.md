@@ -22,7 +22,7 @@ To remedy this, I've created a plugin to make Obsidian my single source of truth
 
 I hope you enjoy.
 
--   Bryce
+-- Bryce
 
 ## Features
 
