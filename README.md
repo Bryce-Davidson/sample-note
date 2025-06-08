@@ -1,6 +1,26 @@
-## Sample Note Beta (0.1.22)
+<div align="center">
+
+# Sample Note Beta
+
+[![Version](https://img.shields.io/badge/version-0.1.25-blue.svg)](https://github.com/bryce-davidson/sample-note/releases)
 
 ![cover](docs/images/cover.gif)
+
+</div>
+
+---
+
+<div align="center">
+
+**[Features](#features)** • **[Installation](#installation)** • **[Documentation](#documentation)** • **[Support](#support)**
+
+</div>
+
+<a href="https://buymeacoffee.com/datanoteable" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
+
+---
+
+## About
 
 I've always loved Obsidian and have been a supporter from nearly the beginning, but I found it tedious to synchronize my notes with other forms of learning programs such as Anki, GoodNotes, etc.
 
@@ -152,3 +172,23 @@ Create flashcards by wrapping content within a card element.
 Flashcards appear in the [hide]"Review Queue"[/hide]
 [/card]
 ```
+
+---
+
+## Support
+
+If you find this plugin helpful, consider supporting its development:
+
+<div align="center">
+
+[![Buy Me A Coffee](https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png)](https://buymeacoffee.com/datanoteable)
+
+</div>
+
+---
+
+<div align="center">
+
+Made with ❤️ by Bryce Davidson
+
+</div>
