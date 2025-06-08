@@ -14,13 +14,15 @@ I hope you enjoy.
 
 ## GoodNotes Style Handwriting
 
-Keep handrwitten notes directly in Obsidian using the GoodNotes style drawing editor.
+Keep handrwitten notes directly in Obsidian and linked to your notes using the GoodNotes style drawing editor.
 
 ![draw](docs/images/draw.gif)
 
 ### Integrated Text Occlusion & Flashcards
 
-Create and review flashcards without needing to worry about syncing them leaving them app. Use Obsidian as your single source of truth.
+Hide content within your notes to ensure you are reviewing the material as you read (can toggle this mode to see notes normally).
+
+Create and review flashcards without having to synchronize to Anki. Your flashcards automatically update as your notes change.
 
 ![flashcard](docs/images/flashcard.gif)
 
