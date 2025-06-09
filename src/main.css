@@ -123,3 +123,12 @@
 	display: inline-block;
 	white-space: nowrap;
 }
+
+/* ============================
+   Math Preload Element
+=============================== */
+.sample-note-math-preload {
+	position: absolute;
+	visibility: hidden;
+	pointer-events: none;
+}

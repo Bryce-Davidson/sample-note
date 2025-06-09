@@ -550,9 +550,7 @@ export default class SampleNotePlugin extends Plugin {
 		setTimeout(async () => {
 			try {
 				const tempEl = document.createElement("div");
-				tempEl.style.position = "absolute";
-				tempEl.style.visibility = "hidden";
-				tempEl.style.pointerEvents = "none";
+				tempEl.addClass("sample-note-math-preload");
 				document.body.appendChild(tempEl);
 
 				await MarkdownRenderer.render(
