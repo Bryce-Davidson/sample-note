@@ -28,9 +28,9 @@ I hope you enjoy.
 
 ## Features
 
-## GoodNotes Style Handwriting
+### GoodNotes Style Handwriting
 
-Keep handrwitten notes directly in Obsidian and linked to your notes using the GoodNotes style drawing editor.
+Keep handwritten notes directly in Obsidian and linked to your notes using the GoodNotes style drawing editor.
 
 ![draw](docs/images/draw.gif)
 
@@ -42,19 +42,19 @@ Create and review flashcards without having to synchronize to Anki. Your flashca
 
 ![flashcard](docs/images/flashcard.gif)
 
-## Integrated Image Occlusion
+### Integrated Image Occlusion
 
 Create, preview, and review image occlusions directly within Obsidian bot within your notes as you read them and as flashcards.
 
 ![occlusion](docs/images/occlusions.gif)
 
-## Flashcard Graph
+### Flashcard Graph
 
-Track your learning progress with the interactive flashcard graph to visualize your study patterns. The graph animates and highlights flashcards whichb need improvement while showing the relationships between different cards. This visualization helps you optimize your study sessions by focusing on the cards that need the most attention.
+Track your learning progress with the interactive flashcard graph to visualize your study patterns. The graph animates and highlights flashcards which need improvement while showing the relationships between different cards. This visualization helps you optimize your study sessions by focusing on the cards that need the most attention.
 
 ![graph](docs/images/graph.gif)
 
-## Copilot Chat Assistant
+### Copilot Chat Assistant
 
 Select the context for the model and ask the assistant to create notes, make flashcards, or explain concepts; or anything else.
 
@@ -119,7 +119,7 @@ Select the context for the model and ask the assistant to create notes, make fla
 
 > When I read my notes, I actually don't want to see everything. This way I know I'm never reading something without actually reviewing it.
 
-## Feature
+### Description
 
 Wrap text in a `[hide][/hide]` element to hide the text.
 
@@ -168,12 +168,12 @@ Click on the "+" button to add an occlusion onto the image.
 
 Enable the "Quick Add" option to add occlusions by dragging and releasing them to add them onto the image.
 
-## HideOne/Hide All
+### HideOne/Hide All
 
 With one or multiple occlusions selected, click on either "HideAll" or "HideOne" to create a flashcard which just contains the image and the selected occlusions.
 
 -   HideAll
-    -   Selected Occlusions will be able to be toggled, while all other occlusions will be permanant.
+    -   Selected Occlusions will be able to be toggled, while all other occlusions will be permanent.
 -   HideOne
     -   Selected Occlusions will be able to be toggled, while all other occlusions will not be present.
 
@@ -194,6 +194,123 @@ Create flashcards by wrapping content within a card element.
 Flashcards appear in the [hide]"Review Queue"[/hide]
 [/card]
 ```
+
+## Review Queue
+
+Open the review queue using the "Review Queue" ribbon icon to see all flashcards within your vault.
+
+![review-queue](docs/images/review-queue.png)
+
+Flashcards in the Review Queue are scheduled using the same SM-2 algorithm used in Anki.
+
+### Filter Options
+
+-   **Due** - Shows all due flashcards
+-   **Scheduled** - Shows all upcoming flashcards which are not due
+-   **Note** - Shows all flashcards in current note
+-   **All Cards** - Shows all flashcards
+
+### Flashcard Modal
+
+Upon clicking on the review button in the "Review Queue", flashcards will appear in the flashcard modal.
+
+Click on one of the five rating buttons to input your easyness-factor rating.
+
+## Flashcard Graph View
+
+Open the Flashcard Graph View to see the Easyness Factor (EF) rating for all flashcards in your connected notes.
+
+![graph](docs/images/graph.gif)
+
+### Controls
+
+Use the controls to change the visual appearance of the graph and modify the animation.
+
+#### Graph Controls
+
+-   Edge
+-   Charge
+-   Card Offset Distance
+-   Card Size
+-   Text Color
+
+#### Animation Controls
+
+-   Play/Pause
+-   Start/End
+-   Click on the timeline to track to a location
+-   Speed of animation
+-   Group by events by specific time intervals
+
+#### Animation Grouping
+
+-   None
+-   Hour
+-   Day
+-   Week
+
+## Drawings/Hand Written Notes
+
+Open the drawing editor using the pencil ribbon icon.
+
+![draw](docs/images/draw.gif)
+
+Drawings are linked directly to notes, as indicated by the title preview of the associated tab.
+
+Drawing view can be toggled to be either in the sidebar or a main view by using the associated control.
+
+### Controls
+
+#### Tools
+
+##### Drawing Tools
+
+-   Pen Brush
+-   Handwriting Brush
+-   Eraser Brush
+-   Highlighter Brush
+-   Freehand Selection Brush
+-   Size Select
+-   Color Select
+
+#### Canvas Modes/Controls
+
+##### Modes
+
+-   Pan Mode
+-   Stylus Only Mode (Excellent for when on a tablet)
+
+##### Controls
+
+-   Background Color Select
+-   Save Button
+-   Return to Home View Button
+-   Undo Button
+-   Redo Button
+-   Set Home View Button
+-   Toggle Sidebar/Main View
+-   Clear Canvas
+
+### Desired Features
+
+-   Lined pages
+-   Obsidian native links
+
+## Chat Assistant
+
+Use the chat editor to interact with your documents, and accomplish tasks such as creating new notes. Ask questions based on the context provided to the chat assistant.
+
+Select from one the most up to date OpenAI models.
+
+Use the context controls to control what chatGPT sees.
+
+![chat](docs/images/chat.gif)
+
+## Desired Features
+
+-   Front/Back Style Cards
+-   Drawing view integration
+-   Prompt Basket Buttons
 
 ---
 
