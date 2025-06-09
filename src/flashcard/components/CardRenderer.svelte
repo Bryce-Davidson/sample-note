@@ -115,7 +115,9 @@
 				);
 
 				if (!error) {
-					contentWrapper.innerHTML = "";
+					while (contentWrapper.firstChild) {
+						contentWrapper.removeChild(contentWrapper.firstChild);
+					}
 					tempContainer.style.display = "";
 					contentWrapper.appendChild(tempContainer);
 				}
@@ -145,7 +147,9 @@
 
 				error = null;
 
-				contentWrapper.innerHTML = "";
+				while (contentWrapper.firstChild) {
+					contentWrapper.removeChild(contentWrapper.firstChild);
+				}
 				tempContainer.style.display = "";
 				contentWrapper.appendChild(tempContainer);
 			}
