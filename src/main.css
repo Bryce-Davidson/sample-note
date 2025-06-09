@@ -132,3 +132,12 @@
 	visibility: hidden;
 	pointer-events: none;
 }
+
+/* ============================
+   Canvas Stylus Mode
+=============================== */
+.sample-note-stylus-only {
+	touch-action: none;
+	-webkit-user-select: none;
+	user-select: none;
+}

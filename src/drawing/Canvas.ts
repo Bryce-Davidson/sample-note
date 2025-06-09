@@ -253,9 +253,7 @@ export class ICanvas extends fabric.Canvas {
 
 		const el = this.upperCanvasEl;
 
-		el.style.touchAction = "none";
-		el.style.webkitUserSelect = "none";
-		el.style.userSelect = "none";
+		el.classList.add("sample-note-stylus-only");
 
 		const gate = (e: PointerEvent) => {
 			if (e.pointerType !== "pen") {
@@ -306,7 +304,7 @@ export class ICanvas extends fabric.Canvas {
 		this.stylusOnly = false;
 		this.skipTargetFind = false;
 
-		this.upperCanvasEl.style.touchAction = "";
+		this.upperCanvasEl.classList.remove("sample-note-stylus-only");
 	}
 }
 
