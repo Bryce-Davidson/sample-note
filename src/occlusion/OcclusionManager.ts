@@ -1,14 +1,14 @@
 import { App } from "obsidian";
 import Konva from "konva";
 import type { OcclusionShape } from "../types";
-import type MyPlugin from "../main";
+import type SampleNotePlugin from "../main";
 import { SvelteOcclusionEditorView } from "./OcclusionEditorView";
 
 export class OcclusionManager {
 	private app: App;
-	private plugin: MyPlugin;
+	private plugin: SampleNotePlugin;
 
-	constructor(app: App, plugin: MyPlugin) {
+	constructor(app: App, plugin: SampleNotePlugin) {
 		this.app = app;
 		this.plugin = plugin;
 	}

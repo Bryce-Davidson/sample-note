@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { TFile } from "obsidian";
-	import type MyPlugin from "../../main";
+	import type SampleNotePlugin from "../../main";
 	import { createFlashcardModal } from "../../flashcard/FlashcardManager";
 
-	export let plugin: MyPlugin;
+	export let plugin: SampleNotePlugin;
 	export let cardState: any;
 	export let filePath: string;
 	export let file: TFile;

@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { onMount, createEventDispatcher } from "svelte";
-	import type MyPlugin from "../../main";
+	import type SampleNotePlugin from "../../main";
 	import type { Flashcard } from "../../types";
 	import CardRenderer from "./CardRenderer.svelte";
 
-	export let plugin: MyPlugin;
+	export let plugin: SampleNotePlugin;
 	export let flashcard: Flashcard;
 
 	const dispatch = createEventDispatcher<{

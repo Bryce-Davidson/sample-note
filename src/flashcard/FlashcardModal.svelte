@@ -2,7 +2,7 @@
 	import { onMount, onDestroy } from "svelte";
 	import { createEventDispatcher } from "svelte";
 	import { Notice } from "obsidian";
-	import type MyPlugin from "../main";
+	import type SampleNotePlugin from "../main";
 	import type { Flashcard, CardMetadata, CardState } from "../types";
 	import {
 		findCardStateAndFile,
@@ -18,7 +18,7 @@
 
 	import { flashcardEventStore } from "./FlashcardEventStore";
 
-	export let plugin: MyPlugin;
+	export let plugin: SampleNotePlugin;
 	export let flashcards: Flashcard[] = [];
 	export let allCardMetadata: CardMetadata[] = [];
 	export let sidebarView: any | null = null;

@@ -1,17 +1,17 @@
 import { ItemView, WorkspaceLeaf } from "obsidian";
 import ChatEditor from "./ChatEditor.svelte";
-import type MyPlugin from "../main";
+import type SampleNotePlugin from "../main";
 import { createShadowRoot } from "../vite";
 
 export const VIEW_TYPE_CHAT = "sample-note-chat";
 
 export class ChatView extends ItemView {
 	private component: ChatEditor | null = null;
-	private plugin: MyPlugin;
+	private plugin: SampleNotePlugin;
 	private isViewActive: boolean = false;
 	private shadowRoot: ShadowRoot | null = null;
 
-	constructor(leaf: WorkspaceLeaf, plugin: MyPlugin) {
+	constructor(leaf: WorkspaceLeaf, plugin: SampleNotePlugin) {
 		super(leaf);
 		this.plugin = plugin;
 

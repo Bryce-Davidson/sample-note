@@ -2,17 +2,17 @@
 
 import { ItemView, WorkspaceLeaf } from "obsidian";
 import ReviewQueueSidebar from "./ReviewQueueSidebar.svelte";
-import type MyPlugin from "src/main";
+import type SampleNotePlugin from "src/main";
 import { createShadowRoot } from "../vite";
 
 export const UNIFIED_VIEW_TYPE = "unified-queue-sidebar";
 
 export class SvelteReviewQueueSidebarView extends ItemView {
 	private component: ReviewQueueSidebar | null = null;
-	readonly plugin: MyPlugin;
+	readonly plugin: SampleNotePlugin;
 	private shadowRoot: ShadowRoot | null = null;
 
-	constructor(leaf: WorkspaceLeaf, plugin: MyPlugin) {
+	constructor(leaf: WorkspaceLeaf, plugin: SampleNotePlugin) {
 		super(leaf);
 		this.plugin = plugin;
 	}

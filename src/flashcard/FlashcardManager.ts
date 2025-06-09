@@ -1,5 +1,5 @@
 import { TFile, Notice, Editor, MarkdownRenderer, Platform } from "obsidian";
-import MyPlugin, { nanoid } from "../main";
+import SampleNotePlugin, { nanoid } from "../main";
 import type { CardState, Flashcard, CardMetadata } from "../types";
 import { createFlashcardModal } from "./FlashcardModalView";
 import {
@@ -8,9 +8,9 @@ import {
 } from "../review/ReviewQueueSidebarView";
 
 export class FlashcardManager {
-	private plugin: MyPlugin;
+	private plugin: SampleNotePlugin;
 
-	constructor(plugin: MyPlugin) {
+	constructor(plugin: SampleNotePlugin) {
 		this.plugin = plugin;
 		this.registerEvents();
 		this.registerMarkdownPostProcessor();
@@ -901,7 +901,7 @@ export function formatReviewDate(date: Date, now: Date): string {
 }
 
 export function findCardStateAndFile(
-	plugin: MyPlugin,
+	plugin: SampleNotePlugin,
 	cardUUID: string
 ): { filePath: string; card: CardState } | null {
 	for (const filePath in plugin.notes) {

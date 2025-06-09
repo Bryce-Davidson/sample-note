@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { createEventDispatcher, onMount } from "svelte";
 	import { MarkdownRenderer } from "obsidian";
-	import type MyPlugin from "../../main";
+	import type SampleNotePlugin from "../../main";
 	import type { Flashcard } from "../../types";
 	import {
 		findCardStateAndFile,
@@ -10,7 +10,7 @@
 	import OcclusionCard from "./OcclusionCard.svelte";
 	import ErrorDisplay from "./ErrorDisplay.svelte";
 
-	export let plugin: MyPlugin;
+	export let plugin: SampleNotePlugin;
 	export let flashcard: Flashcard;
 	export let contentWrapper: HTMLElement;
 

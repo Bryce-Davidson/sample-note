@@ -1,12 +1,12 @@
 import { Modal, App, TFile } from "obsidian";
 import FlashcardModal from "./FlashcardModal.svelte";
-import type MyPlugin from "../main";
+import type SampleNotePlugin from "../main";
 
 import { CardState, Flashcard, CardMetadata } from "src/types";
 
 export class SvelteFlashcardModal extends Modal {
 	private component: FlashcardModal | null = null;
-	private plugin: MyPlugin;
+	private plugin: SampleNotePlugin;
 	private flashcards: Flashcard[];
 	private showNoteTitle: boolean;
 	private allCardMetadata: CardMetadata[];
@@ -19,7 +19,7 @@ export class SvelteFlashcardModal extends Modal {
 	constructor(
 		app: App,
 		flashcards: Flashcard[],
-		plugin: MyPlugin,
+		plugin: SampleNotePlugin,
 		showNoteTitle: boolean = false,
 		allCardMetadata: CardMetadata[] = [],
 		sidebarView: any | null = null,
@@ -115,7 +115,7 @@ export class SvelteFlashcardModal extends Modal {
 export function createFlashcardModal(
 	app: App,
 	flashcards: Flashcard[],
-	plugin: MyPlugin,
+	plugin: SampleNotePlugin,
 	showNoteTitle: boolean = false,
 	allCardMetadata: CardMetadata[] = [],
 	sidebarView: any | null = null,

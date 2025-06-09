@@ -10,13 +10,13 @@
 	} from "../flashcard/FlashcardManager";
 	import Fuse from "fuse.js";
 	import { onMount } from "svelte";
-	import type MyPlugin from "../main";
+	import type SampleNotePlugin from "../main";
 	import SearchInput from "./components/SearchInput.svelte";
 	import FilterButtons from "./components/FilterButtons.svelte";
 	import Card from "./components/Card.svelte";
 	import FilterRow from "./components/FilterRow.svelte";
 
-	export let plugin: MyPlugin;
+	export let plugin: SampleNotePlugin;
 
 	let filterMode = "due";
 	let searchText = "";

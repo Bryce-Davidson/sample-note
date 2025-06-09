@@ -1,6 +1,6 @@
 import { ItemView, WorkspaceLeaf } from "obsidian";
 import OcclusionEditor from "./OcclusionEditor.svelte";
-import type MyPlugin from "../main";
+import type SampleNotePlugin from "../main";
 import { createShadowRoot } from "../vite";
 
 /**
@@ -9,13 +9,13 @@ import { createShadowRoot } from "../vite";
  */
 export class SvelteOcclusionEditorView extends ItemView {
 	private component: OcclusionEditor | null = null;
-	private plugin: MyPlugin;
+	private plugin: SampleNotePlugin;
 	private selectedFilePath: string | null = null;
 	private isComponentMounted: boolean = false;
 	private isViewActive: boolean = false;
 	private shadowRoot: ShadowRoot | null = null;
 
-	constructor(leaf: WorkspaceLeaf, plugin: MyPlugin) {
+	constructor(leaf: WorkspaceLeaf, plugin: SampleNotePlugin) {
 		super(leaf);
 		this.plugin = plugin;
 

@@ -2,7 +2,7 @@ import "../main.css";
 
 import { ItemView, WorkspaceLeaf, TFile } from "obsidian";
 import * as d3 from "d3";
-import MyPlugin from "../main";
+import SampleNotePlugin from "../main";
 import { createShadowRoot } from "../vite";
 
 export const VIEW_TYPE_GRAPH = "graph-view";
@@ -50,7 +50,7 @@ export class GraphView extends ItemView {
 	private cardNodes: Node[] = [];
 	private links: Link[] = [];
 	private zoom!: d3.ZoomBehavior<SVGSVGElement, unknown>;
-	private plugin: MyPlugin;
+	private plugin: SampleNotePlugin;
 	private colorScale = d3.scaleOrdinal(d3.schemeCategory10);
 	private edgeLength: number = 100;
 	private chargeStrength: number = -100;
@@ -66,7 +66,7 @@ export class GraphView extends ItemView {
 	private eventDuration: number = 100;
 	private groupingInterval: number = 0;
 
-	constructor(leaf: WorkspaceLeaf, plugin: MyPlugin) {
+	constructor(leaf: WorkspaceLeaf, plugin: SampleNotePlugin) {
 		super(leaf);
 		this.plugin = plugin;
 	}

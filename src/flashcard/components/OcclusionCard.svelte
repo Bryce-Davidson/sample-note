@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { onMount, onDestroy, createEventDispatcher } from "svelte";
 	import { TFile } from "obsidian";
-	import type MyPlugin from "../../main";
+	import type SampleNotePlugin from "../../main";
 	import type { Flashcard, CardState, OcclusionShape } from "../../types";
 	import Konva from "konva";
 
-	export let plugin: MyPlugin;
+	export let plugin: SampleNotePlugin;
 	export let flashcard: Flashcard;
 	export let cardState: CardState;
 

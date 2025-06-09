@@ -40,7 +40,7 @@ export function generateUUID(): string {
 	return nanoid();
 }
 
-interface MyPluginSettings {
+interface SampleNoteSettings {
 	mySetting: string;
 	hiddenColor: string;
 	randomizeFlashcards: boolean;
@@ -48,7 +48,7 @@ interface MyPluginSettings {
 	openAIApiKey: string;
 }
 
-const DEFAULT_SETTINGS: MyPluginSettings = {
+const DEFAULT_SETTINGS: SampleNoteSettings = {
 	mySetting: "default",
 	hiddenColor: "#272c36",
 	randomizeFlashcards: false,
@@ -57,13 +57,13 @@ const DEFAULT_SETTINGS: MyPluginSettings = {
 };
 
 export interface PluginData {
-	settings: MyPluginSettings;
+	settings: SampleNoteSettings;
 	notes: PluginNotes;
 }
 
-class MyPluginSettingTab extends PluginSettingTab {
-	plugin: MyPlugin;
-	constructor(app: App, plugin: MyPlugin) {
+class SampleNoteSettingTab extends PluginSettingTab {
+	plugin: SampleNotePlugin;
+	constructor(app: App, plugin: SampleNotePlugin) {
 		super(app, plugin);
 		this.plugin = plugin;
 	}
@@ -125,8 +125,8 @@ class MyPluginSettingTab extends PluginSettingTab {
 	}
 }
 
-export default class MyPlugin extends Plugin {
-	settings: MyPluginSettings;
+export default class SampleNotePlugin extends Plugin {
+	settings: SampleNoteSettings;
 	notes: PluginNotes = {};
 	protected refreshTimeout: number | null = null;
 	protected toggleHiddenRibbonEl: HTMLElement | null = null;
@@ -140,7 +140,7 @@ export default class MyPlugin extends Plugin {
 		this.initializeUI();
 		this.registerCommands();
 		this.registerCustomViews();
-		this.addSettingTab(new MyPluginSettingTab(this.app, this));
+		this.addSettingTab(new SampleNoteSettingTab(this.app, this));
 		this.flashcardManager.scheduleNextDueRefresh();
 
 		this.preloadMathRenderer();
