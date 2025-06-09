@@ -87,7 +87,9 @@ export class FlashcardManager {
 				true
 			).open();
 		} else {
-			new Notice("No flashcards found.");
+			new Notice(
+				"No flashcards found in this file. Create flashcards using [card] and [/card] tags."
+			);
 		}
 	}
 
@@ -253,7 +255,42 @@ export class FlashcardManager {
 			}
 		} catch (error) {
 			loadingNotice.hide();
-			new Notice(`Error preparing flashcards: ${error.message}`);
+
+			let errorMessage = "Error preparing flashcards: ";
+
+			if (error instanceof Error) {
+				if (
+					error.message.includes("ENOENT") ||
+					error.message.includes("not found")
+				) {
+					errorMessage =
+						"Some flashcard files could not be found. They may have been moved or deleted.";
+				} else if (
+					error.message.includes("permission") ||
+					error.message.includes("EACCES")
+				) {
+					errorMessage =
+						"Permission denied: Cannot access some flashcard files.";
+				} else if (
+					error.message.includes("parse") ||
+					error.message.includes("syntax")
+				) {
+					errorMessage =
+						"Some files contain invalid syntax that prevents loading flashcards.";
+				} else if (
+					error.message.includes("memory") ||
+					error.message.includes("heap")
+				) {
+					errorMessage =
+						"Too many flashcards to load at once. Try reviewing fewer cards.";
+				} else {
+					errorMessage += error.message;
+				}
+			} else {
+				errorMessage += String(error);
+			}
+
+			new Notice(errorMessage);
 			console.error("Error in showAllDueFlashcardsModal:", error);
 		}
 	}
@@ -417,7 +454,38 @@ export class FlashcardManager {
 			return flashcards;
 		} catch (error) {
 			console.error("Error syncing flashcards:", error);
-			new Notice("Error syncing flashcards. Check console for details.");
+
+			let errorMessage = "Error syncing flashcards: ";
+
+			if (error instanceof Error) {
+				if (
+					error.message.includes("ENOENT") ||
+					error.message.includes("not found")
+				) {
+					errorMessage = "File not found or cannot be accessed.";
+				} else if (
+					error.message.includes("permission") ||
+					error.message.includes("EACCES")
+				) {
+					errorMessage =
+						"Permission denied: Cannot read or modify the file.";
+				} else if (error.message.includes("EISDIR")) {
+					errorMessage =
+						"Cannot sync flashcards: Target is a directory, not a file.";
+				} else if (
+					error.message.includes("parse") ||
+					error.message.includes("syntax")
+				) {
+					errorMessage =
+						"File contains invalid syntax that prevents flashcard parsing.";
+				} else {
+					errorMessage += error.message;
+				}
+			} else {
+				errorMessage += String(error);
+			}
+
+			new Notice(errorMessage);
 			return [];
 		}
 	}
