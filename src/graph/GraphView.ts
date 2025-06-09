@@ -123,151 +123,355 @@ export class GraphView extends ItemView {
 			"fixed z-50 w-64 p-3 border border-gray-700 rounded-lg shadow-lg bg-gray-900/90 backdrop-blur-sm top-4 right-4";
 		container.appendChild(controlBox);
 
-		controlBox.innerHTML = `
-		<div class="space-y-3">
-		  <div class="flex justify-end">
-			<button id="toggleMinimize" class="text-gray-400">
-			  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-			  </svg>
-			</button>
-		  </div>
+		// Create main container
+		const mainContainer = document.createElement("div");
+		mainContainer.className = "space-y-3";
+		controlBox.appendChild(mainContainer);
 
-		  <!-- Controls content -->
-		  <div id="controlsContent" class="space-y-3">
-			<!-- Force Controls Section - Compact -->
-			<div class="bg-gray-800/50 p-2 rounded-md">
-			  <div class="flex flex-col space-y-2">
-				<div class="space-y-1">
-				  <div class="flex justify-between items-center">
-					<span class="text-xs text-indigo-300">Edge</span>
-				  </div>
-				  <input type="range" id="edgeLengthInput" min="50" max="300" value="${
-						this.edgeLength
-					}"
-						class="w-full h-1 rounded-full appearance-none bg-gray-700 cursor-pointer accent-indigo-500" style="width: 100%;">
-				</div>
+		// Create minimize button container
+		const minimizeContainer = document.createElement("div");
+		minimizeContainer.className = "flex justify-end";
+		mainContainer.appendChild(minimizeContainer);
 
-				<div class="space-y-1">
-				  <div class="flex justify-between items-center">
-					<span class="text-xs text-indigo-300">Charge</span>
-				  </div>
-				  <input type="range" id="chargeForceInput" min="-300" max="0" value="${
-						this.chargeStrength
-					}"
-						class="w-full h-1 rounded-full appearance-none bg-gray-700 cursor-pointer accent-indigo-500" style="width: 100%;">
-				</div>
+		const minimizeButton = document.createElement("button");
+		minimizeButton.id = "toggleMinimize";
+		minimizeButton.className = "text-gray-400";
+		minimizeContainer.appendChild(minimizeButton);
 
-				<div class="space-y-1">
-				  <div class="flex justify-between items-center">
-					<span class="text-xs text-indigo-300">Card Offset Distance</span>
-				  </div>
-				  <input type="range" id="cardOffsetDistanceInput" min="10" max="50" value="${
-						this.cardOffsetDistance
-					}"
-						class="w-full h-1 rounded-full appearance-none bg-gray-700 cursor-pointer accent-indigo-500" style="width: 100%;">
-				</div>
+		const minimizeSvg = document.createElementNS(
+			"http://www.w3.org/2000/svg",
+			"svg"
+		);
+		minimizeSvg.setAttribute("class", "w-4 h-4");
+		minimizeSvg.setAttribute("fill", "none");
+		minimizeSvg.setAttribute("stroke", "currentColor");
+		minimizeSvg.setAttribute("viewBox", "0 0 24 24");
+		minimizeSvg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+		minimizeButton.appendChild(minimizeSvg);
 
-				<div class="space-y-1">
-				  <div class="flex justify-between items-center">
-					<span class="text-xs text-indigo-300">Card Size</span>
-				  </div>
-				  <input type="range" id="cardRadiusInput" min="2" max="10" value="${
-						this.cardRadius
-					}"
-						class="w-full h-1 rounded-full appearance-none bg-gray-700 cursor-pointer accent-indigo-500" style="width: 100%;">
-				</div>
+		const minimizePath = document.createElementNS(
+			"http://www.w3.org/2000/svg",
+			"path"
+		);
+		minimizePath.setAttribute("stroke-linecap", "round");
+		minimizePath.setAttribute("stroke-linejoin", "round");
+		minimizePath.setAttribute("stroke-width", "2");
+		minimizePath.setAttribute("d", "M19 9l-7 7-7-7");
+		minimizeSvg.appendChild(minimizePath);
 
-				<div class="space-y-1">
-				  <div class="flex justify-between items-center">
-					<span class="text-xs text-indigo-300">Text Color</span>
-					<input type="color" id="noteTextColorInput" value="${this.noteTextColor}"
-						class="w-6 h-6 rounded cursor-pointer border border-gray-600">
-				  </div>
-				</div>
-			  </div>
-			</div>
+		// Create controls content container
+		const controlsContent = document.createElement("div");
+		controlsContent.id = "controlsContent";
+		controlsContent.className = "space-y-3";
+		mainContainer.appendChild(controlsContent);
 
-			<!-- Timeline Section - Compact -->
-			<div class="bg-gray-800/50 p-2 rounded-md">
-			  <div class="space-y-2">
-				<!-- Progress bar -->
-				<div class="relative">
-				  <div id="progressBarContainer" class="overflow-hidden h-3 flex rounded-full bg-gray-700 cursor-pointer">
-					<div id="efProgressBar" class="transition-all ease-out duration-300 shadow-none flex flex-col justify-center rounded-full bg-gradient-to-r from-indigo-500 to-purple-500" style="width: 0%"></div>
-				  </div>
-				</div>
+		// Create Force Controls Section
+		const forceControls = document.createElement("div");
+		forceControls.className = "p-2 rounded-md bg-gray-800/50";
+		controlsContent.appendChild(forceControls);
 
-				<div class="flex justify-between items-center text-xs">
-				  <span class="text-gray-400 font-mono" id="timeStart">Start</span>
-				  <span id="timelineLabel" class="text-indigo-300 font-mono">0 / 0</span>
-				  <span class="text-gray-400 font-mono" id="timeEnd">End</span>
-				</div>
+		const forceControlsInner = document.createElement("div");
+		forceControlsInner.className = "flex flex-col space-y-2";
+		forceControls.appendChild(forceControlsInner);
 
-				<div class="grid grid-cols-3 gap-1">
-				  <button id="prevEvent" class="text-xs rounded px-2 py-1 bg-indigo-900/50 text-indigo-300 border border-indigo-800">Prev</button>
-				  <button id="playPause" class="text-xs rounded px-2 py-1 bg-indigo-600 text-white border border-indigo-700">Play</button>
-				  <button id="nextEvent" class="text-xs rounded px-2 py-1 bg-indigo-900/50 text-indigo-300 border border-indigo-800">Next</button>
-				</div>
-			  </div>
-			</div>
+		// Edge Length Control
+		const edgeLengthContainer = document.createElement("div");
+		edgeLengthContainer.className = "space-y-1";
+		forceControlsInner.appendChild(edgeLengthContainer);
 
-			<!-- Advanced Settings Section - Compact -->
-			<div class="bg-gray-800/50 p-2 rounded-md">
-			  <div class="flex flex-col space-y-3">
-				<div>
-				  <span class="text-xs text-indigo-300 block mb-1">Speed</span>
-				  <input type="range" id="eventDurationInput" min="50" max="1000" value="${
-						1050 - this.eventDuration
-					}"
-						class="w-full h-1 rounded-full appearance-none bg-gray-700 cursor-pointer accent-indigo-500" style="width: 100%;">
-				  <div class="flex justify-between text-xs text-gray-400 mt-1">
-					<span>Slow</span>
-					<span>Fast</span>
-				  </div>
-				</div>
+		const edgeLengthLabel = document.createElement("div");
+		edgeLengthLabel.className = "flex items-center justify-between";
+		edgeLengthContainer.appendChild(edgeLengthLabel);
 
-				<div>
-				  <span class="text-xs text-indigo-300 block mb-1">Group Events By</span>
-				  <select id="groupingPreset" class="w-full bg-gray-700 border border-gray-600 text-xs rounded px-1.5 py-1 text-white">
-					<option value="0">None</option>
-					<option value="3600000">Hour</option>
-					<option value="86400000">Day</option>
-					<option value="604800000">Week</option>
-					<option value="2592000000">Month</option>
-				  </select>
-				</div>
-			  </div>
-			</div>
+		const edgeLengthSpan = document.createElement("span");
+		edgeLengthSpan.className = "text-xs text-indigo-300";
+		edgeLengthSpan.textContent = "Edge";
+		edgeLengthLabel.appendChild(edgeLengthSpan);
 
-			<!-- Rating Legend - Compact -->
-			<div class="bg-gray-800/50 p-2 rounded-md">
-			  <div class="grid grid-cols-5 gap-1 text-center">
-				<div class="flex flex-col items-center">
-				  <div class="w-3 h-3 rounded-full" style="background-color: #D73027"></div>
-				  <span class="text-xs text-gray-300">1</span>
-				</div>
-				<div class="flex flex-col items-center">
-				  <div class="w-3 h-3 rounded-full" style="background-color: #FC8D59"></div>
-				  <span class="text-xs text-gray-300">2</span>
-				</div>
-				<div class="flex flex-col items-center">
-				  <div class="w-3 h-3 rounded-full" style="background-color: #FEE08B"></div>
-				  <span class="text-xs text-gray-300">3</span>
-				</div>
-				<div class="flex flex-col items-center">
-				  <div class="w-3 h-3 rounded-full" style="background-color: #91CF60"></div>
-				  <span class="text-xs text-gray-300">4</span>
-				</div>
-				<div class="flex flex-col items-center">
-				  <div class="w-3 h-3 rounded-full" style="background-color: #1A9850"></div>
-				  <span class="text-xs text-gray-300">5</span>
-				</div>
-			  </div>
-			</div>
-		  </div>
-		</div>
-		`;
+		const edgeLengthInput = document.createElement("input");
+		edgeLengthInput.type = "range";
+		edgeLengthInput.id = "edgeLengthInput";
+		edgeLengthInput.min = "50";
+		edgeLengthInput.max = "300";
+		edgeLengthInput.value = this.edgeLength.toString();
+		edgeLengthInput.className =
+			"w-full h-1 bg-gray-700 rounded-full appearance-none cursor-pointer accent-indigo-500";
+		edgeLengthInput.style.width = "100%";
+		edgeLengthContainer.appendChild(edgeLengthInput);
+
+		// Charge Force Control
+		const chargeForceContainer = document.createElement("div");
+		chargeForceContainer.className = "space-y-1";
+		forceControlsInner.appendChild(chargeForceContainer);
+
+		const chargeForceLabel = document.createElement("div");
+		chargeForceLabel.className = "flex items-center justify-between";
+		chargeForceContainer.appendChild(chargeForceLabel);
+
+		const chargeForceSpan = document.createElement("span");
+		chargeForceSpan.className = "text-xs text-indigo-300";
+		chargeForceSpan.textContent = "Charge";
+		chargeForceLabel.appendChild(chargeForceSpan);
+
+		const chargeForceInput = document.createElement("input");
+		chargeForceInput.type = "range";
+		chargeForceInput.id = "chargeForceInput";
+		chargeForceInput.min = "-300";
+		chargeForceInput.max = "0";
+		chargeForceInput.value = this.chargeStrength.toString();
+		chargeForceInput.className =
+			"w-full h-1 bg-gray-700 rounded-full appearance-none cursor-pointer accent-indigo-500";
+		chargeForceInput.style.width = "100%";
+		chargeForceContainer.appendChild(chargeForceInput);
+
+		// Card Offset Distance Control
+		const cardOffsetContainer = document.createElement("div");
+		cardOffsetContainer.className = "space-y-1";
+		forceControlsInner.appendChild(cardOffsetContainer);
+
+		const cardOffsetLabel = document.createElement("div");
+		cardOffsetLabel.className = "flex items-center justify-between";
+		cardOffsetContainer.appendChild(cardOffsetLabel);
+
+		const cardOffsetSpan = document.createElement("span");
+		cardOffsetSpan.className = "text-xs text-indigo-300";
+		cardOffsetSpan.textContent = "Card Offset Distance";
+		cardOffsetLabel.appendChild(cardOffsetSpan);
+
+		const cardOffsetInput = document.createElement("input");
+		cardOffsetInput.type = "range";
+		cardOffsetInput.id = "cardOffsetDistanceInput";
+		cardOffsetInput.min = "10";
+		cardOffsetInput.max = "50";
+		cardOffsetInput.value = this.cardOffsetDistance.toString();
+		cardOffsetInput.className =
+			"w-full h-1 bg-gray-700 rounded-full appearance-none cursor-pointer accent-indigo-500";
+		cardOffsetInput.style.width = "100%";
+		cardOffsetContainer.appendChild(cardOffsetInput);
+
+		// Card Size Control
+		const cardSizeContainer = document.createElement("div");
+		cardSizeContainer.className = "space-y-1";
+		forceControlsInner.appendChild(cardSizeContainer);
+
+		const cardSizeLabel = document.createElement("div");
+		cardSizeLabel.className = "flex items-center justify-between";
+		cardSizeContainer.appendChild(cardSizeLabel);
+
+		const cardSizeSpan = document.createElement("span");
+		cardSizeSpan.className = "text-xs text-indigo-300";
+		cardSizeSpan.textContent = "Card Size";
+		cardSizeLabel.appendChild(cardSizeSpan);
+
+		const cardSizeInput = document.createElement("input");
+		cardSizeInput.type = "range";
+		cardSizeInput.id = "cardRadiusInput";
+		cardSizeInput.min = "2";
+		cardSizeInput.max = "10";
+		cardSizeInput.value = this.cardRadius.toString();
+		cardSizeInput.className =
+			"w-full h-1 bg-gray-700 rounded-full appearance-none cursor-pointer accent-indigo-500";
+		cardSizeInput.style.width = "100%";
+		cardSizeContainer.appendChild(cardSizeInput);
+
+		// Text Color Control
+		const textColorContainer = document.createElement("div");
+		textColorContainer.className = "space-y-1";
+		forceControlsInner.appendChild(textColorContainer);
+
+		const textColorLabel = document.createElement("div");
+		textColorLabel.className = "flex items-center justify-between";
+		textColorContainer.appendChild(textColorLabel);
+
+		const textColorSpan = document.createElement("span");
+		textColorSpan.className = "text-xs text-indigo-300";
+		textColorSpan.textContent = "Text Color";
+		textColorLabel.appendChild(textColorSpan);
+
+		const textColorInput = document.createElement("input");
+		textColorInput.type = "color";
+		textColorInput.id = "noteTextColorInput";
+		textColorInput.value = this.noteTextColor;
+		textColorInput.className =
+			"w-6 h-6 border border-gray-600 rounded cursor-pointer";
+		textColorLabel.appendChild(textColorInput);
+
+		// Timeline Section
+		const timelineSection = document.createElement("div");
+		timelineSection.className = "p-2 rounded-md bg-gray-800/50";
+		controlsContent.appendChild(timelineSection);
+
+		const timelineInner = document.createElement("div");
+		timelineInner.className = "space-y-2";
+		timelineSection.appendChild(timelineInner);
+
+		// Progress bar container
+		const progressBarContainer = document.createElement("div");
+		progressBarContainer.id = "progressBarContainer";
+		progressBarContainer.className =
+			"flex h-3 overflow-hidden bg-gray-700 rounded-full cursor-pointer";
+		timelineInner.appendChild(progressBarContainer);
+
+		const progressBar = document.createElement("div");
+		progressBar.id = "efProgressBar";
+		progressBar.className =
+			"flex flex-col justify-center transition-all duration-300 ease-out rounded-full shadow-none bg-gradient-to-r from-indigo-500 to-purple-500";
+		progressBar.style.width = "0%";
+		progressBarContainer.appendChild(progressBar);
+
+		// Timeline labels
+		const timelineLabels = document.createElement("div");
+		timelineLabels.className = "flex items-center justify-between text-xs";
+		timelineInner.appendChild(timelineLabels);
+
+		const timeStart = document.createElement("span");
+		timeStart.id = "timeStart";
+		timeStart.className = "font-mono text-gray-400";
+		timeStart.textContent = "Start";
+		timelineLabels.appendChild(timeStart);
+
+		const timelineLabel = document.createElement("span");
+		timelineLabel.id = "timelineLabel";
+		timelineLabel.className = "font-mono text-indigo-300";
+		timelineLabel.textContent = "0 / 0";
+		timelineLabels.appendChild(timelineLabel);
+
+		const timeEnd = document.createElement("span");
+		timeEnd.id = "timeEnd";
+		timeEnd.className = "font-mono text-gray-400";
+		timeEnd.textContent = "End";
+		timelineLabels.appendChild(timeEnd);
+
+		// Timeline controls
+		const timelineControls = document.createElement("div");
+		timelineControls.className = "grid grid-cols-3 gap-1";
+		timelineInner.appendChild(timelineControls);
+
+		const prevButton = document.createElement("button");
+		prevButton.id = "prevEvent";
+		prevButton.className =
+			"px-2 py-1 text-xs text-indigo-300 border border-indigo-800 rounded bg-indigo-900/50";
+		prevButton.textContent = "Prev";
+		timelineControls.appendChild(prevButton);
+
+		const playPauseButton = document.createElement("button");
+		playPauseButton.id = "playPause";
+		playPauseButton.className =
+			"px-2 py-1 text-xs text-white bg-indigo-600 border border-indigo-700 rounded";
+		playPauseButton.textContent = "Play";
+		timelineControls.appendChild(playPauseButton);
+
+		const nextButton = document.createElement("button");
+		nextButton.id = "nextEvent";
+		nextButton.className =
+			"px-2 py-1 text-xs text-indigo-300 border border-indigo-800 rounded bg-indigo-900/50";
+		nextButton.textContent = "Next";
+		timelineControls.appendChild(nextButton);
+
+		// Advanced Settings Section
+		const advancedSettings = document.createElement("div");
+		advancedSettings.className = "p-2 rounded-md bg-gray-800/50";
+		controlsContent.appendChild(advancedSettings);
+
+		const advancedSettingsInner = document.createElement("div");
+		advancedSettingsInner.className = "flex flex-col space-y-3";
+		advancedSettings.appendChild(advancedSettingsInner);
+
+		// Speed control
+		const speedContainer = document.createElement("div");
+		advancedSettingsInner.appendChild(speedContainer);
+
+		const speedLabel = document.createElement("span");
+		speedLabel.className = "block mb-1 text-xs text-indigo-300";
+		speedLabel.textContent = "Speed";
+		speedContainer.appendChild(speedLabel);
+
+		const speedInput = document.createElement("input");
+		speedInput.type = "range";
+		speedInput.id = "eventDurationInput";
+		speedInput.min = "50";
+		speedInput.max = "1000";
+		speedInput.value = (1050 - this.eventDuration).toString();
+		speedInput.className =
+			"w-full h-1 bg-gray-700 rounded-full appearance-none cursor-pointer accent-indigo-500";
+		speedInput.style.width = "100%";
+		speedContainer.appendChild(speedInput);
+
+		const speedLabels = document.createElement("div");
+		speedLabels.className =
+			"flex justify-between mt-1 text-xs text-gray-400";
+		speedContainer.appendChild(speedLabels);
+
+		const slowLabel = document.createElement("span");
+		slowLabel.textContent = "Slow";
+		speedLabels.appendChild(slowLabel);
+
+		const fastLabel = document.createElement("span");
+		fastLabel.textContent = "Fast";
+		speedLabels.appendChild(fastLabel);
+
+		// Grouping control
+		const groupingContainer = document.createElement("div");
+		advancedSettingsInner.appendChild(groupingContainer);
+
+		const groupingLabel = document.createElement("span");
+		groupingLabel.className = "block mb-1 text-xs text-indigo-300";
+		groupingLabel.textContent = "Group Events By";
+		groupingContainer.appendChild(groupingLabel);
+
+		const groupingSelect = document.createElement("select");
+		groupingSelect.id = "groupingPreset";
+		groupingSelect.className =
+			"w-full bg-gray-700 border border-gray-600 text-xs rounded px-1.5 py-1 text-white";
+		groupingContainer.appendChild(groupingSelect);
+
+		const groupingOptions = [
+			{ value: "0", text: "None" },
+			{ value: "3600000", text: "Hour" },
+			{ value: "86400000", text: "Day" },
+			{ value: "604800000", text: "Week" },
+			{ value: "2592000000", text: "Month" },
+		];
+
+		groupingOptions.forEach((option) => {
+			const optionElement = document.createElement("option");
+			optionElement.value = option.value;
+			optionElement.textContent = option.text;
+			groupingSelect.appendChild(optionElement);
+		});
+
+		// Rating Legend
+		const ratingLegend = document.createElement("div");
+		ratingLegend.className = "p-2 rounded-md bg-gray-800/50";
+		controlsContent.appendChild(ratingLegend);
+
+		const ratingGrid = document.createElement("div");
+		ratingGrid.className = "grid grid-cols-5 gap-1 text-center";
+		ratingLegend.appendChild(ratingGrid);
+
+		const ratings = [
+			{ color: "#D73027", value: "1" },
+			{ color: "#FC8D59", value: "2" },
+			{ color: "#FEE08B", value: "3" },
+			{ color: "#91CF60", value: "4" },
+			{ color: "#1A9850", value: "5" },
+		];
+
+		ratings.forEach((rating) => {
+			const ratingContainer = document.createElement("div");
+			ratingContainer.className = "flex flex-col items-center";
+			ratingGrid.appendChild(ratingContainer);
+
+			const colorDot = document.createElement("div");
+			colorDot.className = "w-3 h-3 rounded-full";
+			colorDot.style.backgroundColor = rating.color;
+			ratingContainer.appendChild(colorDot);
+
+			const ratingValue = document.createElement("span");
+			ratingValue.className = "text-xs text-gray-300";
+			ratingValue.textContent = rating.value;
+			ratingContainer.appendChild(ratingValue);
+		});
 
 		this.setupControlListeners(controlBox);
 		this.setupTimelineControls(controlBox);
