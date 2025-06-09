@@ -34,7 +34,6 @@
 	}>();
 
 	let canvasContainer: HTMLDivElement;
-	let bgColorPreview: HTMLDivElement;
 	let bgColorInput: HTMLInputElement;
 	let editControlsGroup: HTMLDivElement;
 
@@ -54,6 +53,9 @@
 
 	let autoSaveTimeoutId: number | null = null;
 	const AUTO_SAVE_DELAY = 2000;
+
+	// Reactive variable for background color preview
+	let bgColorPreviewColor = "#ffffff";
 
 	const defaultSize: ToolSize = {
 		name: SizeType.Small,
@@ -259,9 +261,7 @@
 		const { color } = event.detail;
 		drawingState.update((state) => ({ ...state, backgroundColor: color }));
 
-		if (bgColorPreview) {
-			bgColorPreview.style.backgroundColor = color;
-		}
+		bgColorPreviewColor = color;
 		if (bgColorInput) {
 			bgColorInput.value = color;
 		}
@@ -282,15 +282,15 @@
 	}
 
 	function setupBackgroundColorPicker() {
-		if (!bgColorInput || !bgColorPreview) return;
+		if (!bgColorInput) return;
 
-		bgColorPreview.style.backgroundColor = "white";
+		bgColorPreviewColor = "#ffffff";
 
 		const colorChangeHandler = (e: Event) => {
 			const target = e.target as HTMLInputElement;
 			const color = target.value;
 			if (isBeingUpdatedExternally) return;
-			bgColorPreview.style.backgroundColor = color;
+			bgColorPreviewColor = color;
 			if (canvas) {
 				canvas.backgroundColor = color;
 			}
@@ -320,9 +320,7 @@
 
 		if (drawingData.viewState?.backgroundColor) {
 			const bgColor = drawingData.viewState.backgroundColor;
-			if (bgColorPreview) {
-				bgColorPreview.style.backgroundColor = bgColor;
-			}
+			bgColorPreviewColor = bgColor;
 			if (bgColorInput) {
 				bgColorInput.value = bgColor;
 			}
@@ -426,7 +424,10 @@
 		<!-- Group 2: Background Color -->
 		<div class="background-color-group">
 			<div class="color-picker-button" title="Change Background Color">
-				<div class="color-preview" bind:this={bgColorPreview}></div>
+				<div
+					class="color-preview"
+					style:background-color={bgColorPreviewColor}
+				></div>
 				<input
 					type="color"
 					class="color-input"
