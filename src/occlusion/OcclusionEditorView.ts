@@ -76,10 +76,7 @@ export class SvelteOcclusionEditorView extends ItemView {
 			this.shadowRoot = createShadowRoot(targetEl);
 
 			const componentContainer = document.createElement("div");
-			componentContainer.style.width = "100%";
-			componentContainer.style.height = "100%";
-			componentContainer.style.display = "flex";
-			componentContainer.style.flexDirection = "column";
+			componentContainer.addClass("occlusion-component-container");
 
 			this.shadowRoot.appendChild(componentContainer);
 
@@ -169,16 +166,9 @@ export class SvelteOcclusionEditorView extends ItemView {
 			this.shadowRoot = createShadowRoot(targetEl);
 
 			const componentContainer = document.createElement("div");
-			componentContainer.style.width = "100%";
-			componentContainer.style.height = "100%";
-			componentContainer.style.display = "flex";
-			componentContainer.style.flexDirection = "column";
-			componentContainer.style.position = "absolute";
-			componentContainer.style.left = "0";
-			componentContainer.style.top = "0";
-			componentContainer.style.right = "0";
-			componentContainer.style.bottom = "0";
-			componentContainer.style.overflow = "hidden";
+			componentContainer.addClass(
+				"occlusion-component-container-absolute"
+			);
 
 			this.shadowRoot.appendChild(componentContainer);
 
