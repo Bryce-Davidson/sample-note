@@ -18,7 +18,18 @@ export class FlashcardManager {
 
 	private registerMarkdownPostProcessor(): void {
 		this.plugin.registerMarkdownPostProcessor((el: HTMLElement) => {
-			el.innerHTML = el.innerHTML.replace(/\[\/?card(?:=[^\]]+)?\]/g, "");
+			const textContent = el.textContent || "";
+			const cleanedContent = textContent.replace(
+				/\[\/?card(?:=[^\]]+)?\]/g,
+				""
+			);
+			if (textContent !== cleanedContent) {
+				const textNode = document.createTextNode(cleanedContent);
+				while (el.firstChild) {
+					el.removeChild(el.firstChild);
+				}
+				el.appendChild(textNode);
+			}
 		});
 	}
 
