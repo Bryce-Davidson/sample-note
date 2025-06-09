@@ -159,7 +159,9 @@ export class OcclusionManager {
 		width: number,
 		height: number
 	): void {
-		container.innerHTML = "";
+		while (container.firstChild) {
+			container.removeChild(container.firstChild);
+		}
 
 		const img = new Image();
 
@@ -313,8 +315,9 @@ export class OcclusionManager {
 
 				if (occlusionInteractionEnabled) {
 					enableShapeInteraction();
-					toggleButton.style.backgroundColor = "#4CAF50";
-					toggleButton.innerHTML = "";
+					while (toggleButton.firstChild) {
+						toggleButton.removeChild(toggleButton.firstChild);
+					}
 					container.classList.remove(
 						"occlusion-interaction-disabled"
 					);
@@ -322,8 +325,9 @@ export class OcclusionManager {
 				} else {
 					resetShapesVisibility();
 					disableShapeInteraction();
-					toggleButton.style.backgroundColor = "#4A6BF5";
-					toggleButton.innerHTML = "";
+					while (toggleButton.firstChild) {
+						toggleButton.removeChild(toggleButton.firstChild);
+					}
 					container.classList.remove("occlusion-interaction-enabled");
 					container.classList.add("occlusion-interaction-disabled");
 				}
@@ -345,7 +349,9 @@ export class OcclusionManager {
 	): HTMLButtonElement {
 		const toggleButton = document.createElement("button");
 		toggleButton.className = "occlusion-toggle-button";
-		toggleButton.innerHTML = "";
+		while (toggleButton.firstChild) {
+			toggleButton.removeChild(toggleButton.firstChild);
+		}
 		toggleButton.style.position = "absolute";
 		toggleButton.style.bottom = "10px";
 		toggleButton.style.right = "10px";
@@ -412,7 +418,9 @@ export class OcclusionManager {
 					height
 				);
 			} else {
-				container.innerHTML = "";
+				while (container.firstChild) {
+					container.removeChild(container.firstChild);
+				}
 				const img = document.createElement("img");
 				img.src = originalSrc;
 				img.width = width;
