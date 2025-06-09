@@ -1,4 +1,4 @@
-import { TFile, Notice, Editor, MarkdownRenderer } from "obsidian";
+import { TFile, Notice, Editor, MarkdownRenderer, Platform } from "obsidian";
 import MyPlugin, { nanoid } from "../main";
 import type { CardState, Flashcard, CardMetadata } from "../types";
 import { createFlashcardModal } from "./FlashcardModalView";
@@ -25,7 +25,7 @@ export class FlashcardManager {
 	private registerEvents(): void {
 		this.plugin.registerEvent(
 			this.plugin.app.workspace.on("file-open", async (file: TFile) => {
-				if (file && file instanceof TFile) {
+				if (file && file instanceof TFile && file.extension === "md") {
 					await this.syncFlashcardsForFile(file);
 					this.refreshUnifiedQueue();
 
@@ -296,8 +296,65 @@ export class FlashcardManager {
 	}
 
 	async syncFlashcardsForFile(file: TFile): Promise<Flashcard[]> {
+		// Only process markdown files
+		if (file.extension !== "md") {
+			return [];
+		}
+
 		try {
-			let content = await this.plugin.app.vault.read(file);
+			let content: string;
+
+			try {
+				content = await this.plugin.app.vault.read(file);
+			} catch (readError) {
+				if (Platform.isMobile) {
+					console.warn(
+						"Initial file read failed on mobile, retrying...",
+						readError
+					);
+
+					await new Promise((resolve) => setTimeout(resolve, 100));
+
+					try {
+						content = await this.plugin.app.vault.read(file);
+					} catch (retryError) {
+						console.warn(
+							"Retry failed, attempting adapter read...",
+							retryError
+						);
+
+						try {
+							const adapter = this.plugin.app.vault.adapter;
+							if ("read" in adapter) {
+								content = await adapter.read(file.path);
+							} else {
+								throw retryError;
+							}
+						} catch (adapterError) {
+							throw new Error(
+								`Unable to read file after multiple attempts: ${adapterError.message}`
+							);
+						}
+					}
+				} else {
+					throw readError;
+				}
+			}
+
+			// Normalize content for cross-platform compatibility
+			if (Platform.isMobile) {
+				// Remove BOM if present
+				if (content.charCodeAt(0) === 0xfeff) {
+					content = content.slice(1);
+				}
+
+				// Normalize line endings
+				content = content.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+
+				// Remove any null characters that might cause issues
+				content = content.replace(/\0/g, "");
+			}
+
 			const flashcards: Flashcard[] = [];
 			const now = new Date().toISOString();
 
@@ -455,29 +512,40 @@ export class FlashcardManager {
 		} catch (error) {
 			console.error("Error syncing flashcards:", error);
 
-			let errorMessage = "Error syncing flashcards: ";
+			let errorMessage = `Error syncing flashcards in "${file.name}": `;
 
 			if (error instanceof Error) {
 				if (
+					Platform.isMobile &&
+					(error.message.includes("correct format") ||
+						error.message.includes("couldn't be opened") ||
+						error.message.includes("format"))
+				) {
+					errorMessage = `File encoding issue detected in "${file.name}". The file may contain special characters that cannot be read on mobile. Try editing and saving the file again.`;
+				} else if (
 					error.message.includes("ENOENT") ||
 					error.message.includes("not found")
 				) {
-					errorMessage = "File not found or cannot be accessed.";
+					errorMessage = `File "${file.name}" not found or cannot be accessed.`;
 				} else if (
 					error.message.includes("permission") ||
 					error.message.includes("EACCES")
 				) {
-					errorMessage =
-						"Permission denied: Cannot read or modify the file.";
+					errorMessage = `Permission denied: Cannot read or modify "${file.name}".`;
 				} else if (error.message.includes("EISDIR")) {
-					errorMessage =
-						"Cannot sync flashcards: Target is a directory, not a file.";
+					errorMessage = `Cannot sync flashcards: "${file.name}" is a directory, not a file.`;
 				} else if (
 					error.message.includes("parse") ||
 					error.message.includes("syntax")
 				) {
-					errorMessage =
-						"File contains invalid syntax that prevents flashcard parsing.";
+					errorMessage = `File "${file.name}" contains invalid syntax that prevents flashcard parsing.`;
+				} else if (
+					Platform.isMobile &&
+					error.message.includes(
+						"Unable to read file after multiple attempts"
+					)
+				) {
+					errorMessage = `Unable to access "${file.name}" on mobile. Please ensure the file is synced and try again.`;
 				} else {
 					errorMessage += error.message;
 				}
