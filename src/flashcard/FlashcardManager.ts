@@ -995,75 +995,276 @@ export function updateCardState(
 	return updatedCard;
 }
 
+// Store click handlers to ensure proper cleanup
+const clickHandlerMap = new WeakMap<HTMLElement, (ev: MouseEvent) => void>();
+
 export function processCustomHiddenText(
 	rootEl: HTMLElement,
 	hidden: boolean = true,
 	hideGroupId?: string
 ): void {
-	const elements = rootEl.querySelectorAll("*");
-	elements.forEach((element) => {
-		let html = element.innerHTML;
-		if (html.includes("[hide") && html.includes("[/hide]")) {
-			html = html.replace(
-				/\[hide=(\d+)\]([\s\S]*?)\[\/hide\]/g,
-				(match, groupId, content) => {
-					const shouldHide = hideGroupId
-						? groupId === hideGroupId
-						: hidden;
-					const hiddenClass = shouldHide
-						? "sample-note-is-hidden"
-						: "";
-					return `<span class="sample-note-hidable-element group-hide ${hiddenClass}" data-group="${groupId}">${content}</span>`;
-				}
-			);
+	// Helper to create a hidden span element
+	const createHiddenSpan = (groupId?: string): HTMLElement => {
+		const span = document.createElement("span");
+		span.classList.add("sample-note-hidable-element");
 
-			html = html.replace(
-				/\[hide\]([\s\S]*?)\[\/hide\]/g,
-				(match, content) => {
-					const shouldHide = hideGroupId ? false : hidden;
-					const hiddenClass = shouldHide
-						? "sample-note-is-hidden"
-						: "";
-					return `<span class="sample-note-hidable-element ${hiddenClass}">${content}</span>`;
-				}
-			);
-
-			element.innerHTML = html;
-			element.querySelectorAll(".group-hide").forEach((el) => {
-				el.addEventListener("click", function () {
-					const group = this.getAttribute("data-group");
-					if (!group) {
-						this.classList.toggle("sample-note-is-hidden");
-					} else {
-						const groupElements = document.querySelectorAll(
-							`.group-hide[data-group="${group}"]`
-						);
-						const isHidden =
-							groupElements.length > 0 &&
-							groupElements[0].classList.contains(
-								"sample-note-is-hidden"
-							);
-						groupElements.forEach((elem: HTMLElement) => {
-							if (isHidden) {
-								elem.classList.remove("sample-note-is-hidden");
-							} else {
-								elem.classList.add("sample-note-is-hidden");
-							}
-						});
-					}
-				});
-			});
-			element
-				.querySelectorAll(
-					".sample-note-hidable-element:not(.group-hide)"
-				)
-				.forEach((el) => {
-					el.addEventListener("click", function () {
-						this.classList.toggle("sample-note-is-hidden");
-					});
-				});
+		if (groupId) {
+			span.classList.add("group-hide");
+			span.dataset.group = groupId;
+			const shouldHide = hideGroupId ? groupId === hideGroupId : hidden;
+			if (shouldHide) span.classList.add("sample-note-is-hidden");
+		} else {
+			const shouldHide = hideGroupId ? false : hidden;
+			if (shouldHide) span.classList.add("sample-note-is-hidden");
 		}
+
+		return span;
+	};
+
+	// Process all text nodes and replace hide tags
+	const processTextNodes = (parent: Node): void => {
+		// Get all text nodes
+		const walker = document.createTreeWalker(parent, NodeFilter.SHOW_TEXT, {
+			acceptNode: (node) => {
+				// Skip text nodes inside already processed hidden elements
+				if (
+					(node.parentElement as HTMLElement)?.closest(
+						".sample-note-hidable-element"
+					)
+				) {
+					return NodeFilter.FILTER_REJECT;
+				}
+				return node.nodeValue && node.nodeValue.includes("[hide")
+					? NodeFilter.FILTER_ACCEPT
+					: NodeFilter.FILTER_REJECT;
+			},
+		});
+
+		const textNodes: Text[] = [];
+		let node;
+		while ((node = walker.nextNode())) {
+			textNodes.push(node as Text);
+		}
+
+		// Process each text node
+		textNodes.forEach((textNode) => {
+			const text = textNode.nodeValue || "";
+			const parent = textNode.parentNode;
+			if (!parent) return;
+
+			// Parse the text and build a fragment
+			const fragment = document.createDocumentFragment();
+			let lastIndex = 0;
+
+			// Find all complete hide blocks
+			const regex = /\[hide(?:=(\d+))?\]([\s\S]*?)\[\/hide\]/g;
+			let match;
+
+			while ((match = regex.exec(text)) !== null) {
+				// Add text before the match
+				if (match.index > lastIndex) {
+					fragment.appendChild(
+						document.createTextNode(
+							text.substring(lastIndex, match.index)
+						)
+					);
+				}
+
+				// Create hidden span with the content
+				const span = createHiddenSpan(match[1]);
+				span.textContent = match[2];
+				fragment.appendChild(span);
+
+				lastIndex = match.index + match[0].length;
+			}
+
+			// Add remaining text
+			if (lastIndex < text.length) {
+				fragment.appendChild(
+					document.createTextNode(text.substring(lastIndex))
+				);
+			}
+
+			// Only replace if we found matches
+			if (lastIndex > 0) {
+				parent.replaceChild(fragment, textNode);
+			}
+		});
+	};
+
+	// Handle cases where hide tags span across multiple nodes
+	const processComplexHideTags = (container: Node): void => {
+		let inHideBlock = false;
+		let currentHideSpan: HTMLElement | null = null;
+		let hideStartText = "";
+
+		const processNode = (node: Node): Node | null => {
+			if (node.nodeType === Node.TEXT_NODE) {
+				const text = node.nodeValue || "";
+				let newText = text;
+				let modified = false;
+
+				// Check for incomplete hide start tag
+				if (!inHideBlock && text.includes("[hide")) {
+					const startMatch = text.match(/\[hide(?:=(\d+))?\]$/);
+					if (startMatch) {
+						// Hide tag at the end, content continues in next node
+						const beforeTag = text.substring(
+							0,
+							text.length - startMatch[0].length
+						);
+						if (beforeTag) {
+							const textNode = document.createTextNode(beforeTag);
+							node.parentNode?.insertBefore(textNode, node);
+						}
+
+						currentHideSpan = createHiddenSpan(startMatch[1]);
+						node.parentNode?.insertBefore(currentHideSpan, node);
+						inHideBlock = true;
+
+						// Remove the processed node
+						const nextNode = node.nextSibling;
+						node.parentNode?.removeChild(node);
+						return nextNode;
+					}
+				}
+
+				// Check for hide end tag
+				if (inHideBlock && text.includes("[/hide]")) {
+					const endIndex = text.indexOf("[/hide]");
+					const beforeEnd = text.substring(0, endIndex);
+					const afterEnd = text.substring(endIndex + 7);
+
+					if (beforeEnd && currentHideSpan) {
+						currentHideSpan.appendChild(
+							document.createTextNode(beforeEnd)
+						);
+					}
+
+					inHideBlock = false;
+					currentHideSpan = null;
+
+					if (afterEnd) {
+						const afterNode = document.createTextNode(afterEnd);
+						node.parentNode?.insertBefore(
+							afterNode,
+							node.nextSibling
+						);
+					}
+
+					// Remove the processed node
+					const nextNode = node.nextSibling;
+					node.parentNode?.removeChild(node);
+					return afterEnd ? nextNode : nextNode;
+				}
+
+				// If we're in a hide block, move the entire text node into the span
+				if (inHideBlock && currentHideSpan) {
+					currentHideSpan.appendChild(node.cloneNode(true));
+					const nextNode = node.nextSibling;
+					node.parentNode?.removeChild(node);
+					return nextNode;
+				}
+			} else if (node.nodeType === Node.ELEMENT_NODE) {
+				// If we're in a hide block, move the entire element into the span
+				if (inHideBlock && currentHideSpan) {
+					currentHideSpan.appendChild(node.cloneNode(true));
+					const nextNode = node.nextSibling;
+					node.parentNode?.removeChild(node);
+					return nextNode;
+				}
+			}
+
+			return node.nextSibling;
+		};
+
+		// Process all child nodes
+		let child = container.firstChild;
+		while (child) {
+			child = processNode(child) as ChildNode | null;
+		}
+	};
+
+	// First pass: process simple hide tags within single text nodes
+	processTextNodes(rootEl);
+
+	// Second pass: handle complex cases where tags span multiple nodes
+	// Find containers that might have split hide tags
+	const containersToCheck: Element[] = [rootEl];
+	const walker = document.createTreeWalker(rootEl, NodeFilter.SHOW_ELEMENT, {
+		acceptNode: (node) => {
+			const element = node as Element;
+			if (element.classList.contains("sample-note-hidable-element")) {
+				return NodeFilter.FILTER_REJECT;
+			}
+			// Check if any child text nodes contain partial hide tags
+			const hasPartialTags = Array.from(element.childNodes).some(
+				(child) => {
+					if (child.nodeType === Node.TEXT_NODE) {
+						const text = child.nodeValue || "";
+						return (
+							text.includes("[hide") && !text.includes("[/hide]")
+						);
+					}
+					return false;
+				}
+			);
+			return hasPartialTags
+				? NodeFilter.FILTER_ACCEPT
+				: NodeFilter.FILTER_SKIP;
+		},
 	});
+
+	let element;
+	while ((element = walker.nextNode())) {
+		containersToCheck.push(element as Element);
+	}
+
+	// Process containers from deepest to shallowest
+	containersToCheck.reverse().forEach((container) => {
+		processComplexHideTags(container);
+	});
+
+	// Add click handler using event delegation
+	const clickHandler = (ev: MouseEvent) => {
+		const target = ev.target as HTMLElement;
+		const hidableElement = target.closest(
+			".sample-note-hidable-element"
+		) as HTMLElement;
+
+		if (!hidableElement || !rootEl.contains(hidableElement)) return;
+
+		ev.stopPropagation();
+
+		const group = hidableElement.dataset.group;
+		if (!group) {
+			hidableElement.classList.toggle("sample-note-is-hidden");
+		} else {
+			const groupElements = rootEl.querySelectorAll<HTMLElement>(
+				`.sample-note-hidable-element[data-group="${group}"]`
+			);
+			const isHidden = hidableElement.classList.contains(
+				"sample-note-is-hidden"
+			);
+			groupElements.forEach((elem) => {
+				if (isHidden) {
+					elem.classList.remove("sample-note-is-hidden");
+				} else {
+					elem.classList.add("sample-note-is-hidden");
+				}
+			});
+		}
+	};
+
+	// Remove existing listener if present
+	const existingHandler = clickHandlerMap.get(rootEl);
+	if (existingHandler) {
+		rootEl.removeEventListener("click", existingHandler);
+	}
+
+	// Add new listener and store reference
+	rootEl.addEventListener("click", clickHandler);
+	clickHandlerMap.set(rootEl, clickHandler);
 }
 
 export function processMathBlocks(rootEl: HTMLElement): void {
