@@ -10,6 +10,7 @@ import {
 	Setting,
 	TFile,
 	setIcon,
+	MarkdownRenderer,
 } from "obsidian";
 import { GraphView, VIEW_TYPE_GRAPH } from "./graph/GraphView";
 import { customAlphabet } from "nanoid";
@@ -141,6 +142,8 @@ export default class MyPlugin extends Plugin {
 		this.registerCustomViews();
 		this.addSettingTab(new MyPluginSettingTab(this.app, this));
 		this.flashcardManager.scheduleNextDueRefresh();
+
+		this.preloadMathRenderer();
 
 		this.registerMarkdownPostProcessor((element, context) => {
 			const isFlashcard =
@@ -541,5 +544,29 @@ export default class MyPlugin extends Plugin {
 			});
 		}
 		this.app.workspace.revealLeaf(leaf);
+	}
+
+	private async preloadMathRenderer(): Promise<void> {
+		setTimeout(async () => {
+			try {
+				const tempEl = document.createElement("div");
+				tempEl.style.position = "absolute";
+				tempEl.style.visibility = "hidden";
+				tempEl.style.pointerEvents = "none";
+				document.body.appendChild(tempEl);
+
+				await MarkdownRenderer.render(
+					this.app,
+					"$x^2$ and $$\\int_0^1 f(x)dx$$",
+					tempEl,
+					"",
+					this
+				);
+
+				setTimeout(() => tempEl.remove(), 500);
+			} catch (e) {
+				console.log("Math renderer preload attempted:", e);
+			}
+		}, 1000);
 	}
 }

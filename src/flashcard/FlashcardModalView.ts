@@ -1,4 +1,4 @@
-import { Modal, App, TFile } from "obsidian";
+import { Modal, App, TFile, MarkdownRenderer } from "obsidian";
 import FlashcardModal from "./FlashcardModal.svelte";
 import type MyPlugin from "../main";
 
