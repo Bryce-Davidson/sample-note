@@ -74,10 +74,7 @@ export class ChatView extends ItemView {
 			this.shadowRoot = createShadowRoot(targetEl);
 
 			const componentContainer = document.createElement("div");
-			componentContainer.style.width = "100%";
-			componentContainer.style.height = "100%";
-			componentContainer.style.display = "flex";
-			componentContainer.style.flexDirection = "column";
+			componentContainer.classList.add("chat-editor-component-container");
 
 			this.shadowRoot.appendChild(componentContainer);
 
