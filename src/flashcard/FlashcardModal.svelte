@@ -47,8 +47,7 @@
 				noticeElements.length - 1
 			] as HTMLElement;
 			if (latestNotice) {
-				latestNotice.style.top = "0";
-				latestNotice.style.bottom = "unset";
+				latestNotice.addClass("sample-note-top-notice");
 			}
 		}
 		return notice;

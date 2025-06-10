@@ -169,3 +169,11 @@
 	flex-direction: column;
 	position: relative;
 }
+
+/* ============================
+   Notice Positioning
+=============================== */
+.sample-note-top-notice {
+	top: 0;
+	bottom: unset;
+}
