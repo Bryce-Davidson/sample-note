@@ -258,3 +258,10 @@
 .occlusion-interaction-enabled .occlusion-toggle-button {
 	background-color: #4caf50; /* Green when enabled */
 }
+
+/* ============================
+   Progress Bar
+=============================== */
+.sample-note-progress-bar {
+	width: var(--progress-width, 0%);
+}

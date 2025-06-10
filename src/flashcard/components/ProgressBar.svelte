@@ -9,7 +9,7 @@
 		requestAnimationFrame(() => {
 			if (!progressBar) return;
 			const progress = ((currentIndex + 1) / totalCardCount) * 100;
-			progressBar.style.width = `${progress}%`;
+			progressBar.style.setProperty("--progress-width", `${progress}%`);
 		});
 	}
 
@@ -19,7 +19,10 @@
 </script>
 
 <div class="progress-container">
-	<div class="progress-bar" bind:this={progressBar}></div>
+	<div
+		class="progress-bar sample-note-progress-bar"
+		bind:this={progressBar}
+	></div>
 </div>
 
 <style lang="postcss">
