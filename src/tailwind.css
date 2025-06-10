@@ -67,3 +67,65 @@
 	max-height: 200px;
 	overflow-y: auto;
 }
+
+/* Graph View Component Container */
+.graph-view-component-container {
+	width: 100%;
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	position: absolute;
+	left: 0;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	overflow: hidden;
+}
+
+/* Graph View Control Box */
+.graph-view-control-box-minimized {
+	width: auto;
+	padding: 0.5rem;
+}
+
+.graph-view-control-box-expanded {
+	width: 16rem;
+	padding: 0.75rem;
+}
+
+/* Graph View SVG Transform */
+.graph-view-svg-minimized {
+	transform: rotate(180deg);
+}
+
+.graph-view-svg-expanded {
+	transform: rotate(0deg);
+}
+
+/* Graph View Progress Bar */
+.graph-view-progress-bar-initial {
+	width: 0%;
+}
+
+.graph-view-progress-bar {
+	width: var(--progress-width, 0%);
+}
+
+/* Graph View Range Input */
+.graph-view-range-input {
+	width: 100%;
+}
+
+/* Graph View Controls Content */
+.graph-view-controls-content-hidden {
+	display: none;
+}
+
+.graph-view-controls-content-visible {
+	display: block;
+}
+
+/* Graph View Rating Color Dot */
+.graph-view-rating-dot {
+	background-color: var(--rating-color);
+}

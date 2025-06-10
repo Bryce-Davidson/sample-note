@@ -90,16 +90,7 @@ export class GraphView extends ItemView {
 		this.shadowRoot = createShadowRoot(this.containerEl);
 
 		const componentContainer = document.createElement("div");
-		componentContainer.style.width = "100%";
-		componentContainer.style.height = "100%";
-		componentContainer.style.display = "flex";
-		componentContainer.style.flexDirection = "column";
-		componentContainer.style.position = "absolute";
-		componentContainer.style.left = "0";
-		componentContainer.style.top = "0";
-		componentContainer.style.right = "0";
-		componentContainer.style.bottom = "0";
-		componentContainer.style.overflow = "hidden";
+		componentContainer.className = "graph-view-component-container";
 
 		this.shadowRoot.appendChild(componentContainer);
 
@@ -120,7 +111,7 @@ export class GraphView extends ItemView {
 	private initControls(container: HTMLElement) {
 		const controlBox = document.createElement("div");
 		controlBox.className =
-			"fixed z-50 w-64 p-3 border border-gray-700 rounded-lg shadow-lg bg-gray-900/90 backdrop-blur-sm top-4 right-4";
+			"fixed z-50 w-64 p-3 border border-gray-700 rounded-lg shadow-lg bg-gray-900/90 backdrop-blur-sm top-4 right-4 graph-view-control-box-expanded";
 		container.appendChild(controlBox);
 
 		// Create main container
@@ -162,7 +153,8 @@ export class GraphView extends ItemView {
 		// Create controls content container
 		const controlsContent = document.createElement("div");
 		controlsContent.id = "controlsContent";
-		controlsContent.className = "space-y-3";
+		controlsContent.className =
+			"space-y-3 graph-view-controls-content-visible";
 		mainContainer.appendChild(controlsContent);
 
 		// Create Force Controls Section
@@ -195,8 +187,7 @@ export class GraphView extends ItemView {
 		edgeLengthInput.max = "300";
 		edgeLengthInput.value = this.edgeLength.toString();
 		edgeLengthInput.className =
-			"w-full h-1 bg-gray-700 rounded-full appearance-none cursor-pointer accent-indigo-500";
-		edgeLengthInput.style.width = "100%";
+			"w-full h-1 bg-gray-700 rounded-full appearance-none cursor-pointer accent-indigo-500 graph-view-range-input";
 		edgeLengthContainer.appendChild(edgeLengthInput);
 
 		// Charge Force Control
@@ -220,8 +211,7 @@ export class GraphView extends ItemView {
 		chargeForceInput.max = "0";
 		chargeForceInput.value = this.chargeStrength.toString();
 		chargeForceInput.className =
-			"w-full h-1 bg-gray-700 rounded-full appearance-none cursor-pointer accent-indigo-500";
-		chargeForceInput.style.width = "100%";
+			"w-full h-1 bg-gray-700 rounded-full appearance-none cursor-pointer accent-indigo-500 graph-view-range-input";
 		chargeForceContainer.appendChild(chargeForceInput);
 
 		// Card Offset Distance Control
@@ -245,8 +235,7 @@ export class GraphView extends ItemView {
 		cardOffsetInput.max = "50";
 		cardOffsetInput.value = this.cardOffsetDistance.toString();
 		cardOffsetInput.className =
-			"w-full h-1 bg-gray-700 rounded-full appearance-none cursor-pointer accent-indigo-500";
-		cardOffsetInput.style.width = "100%";
+			"w-full h-1 bg-gray-700 rounded-full appearance-none cursor-pointer accent-indigo-500 graph-view-range-input";
 		cardOffsetContainer.appendChild(cardOffsetInput);
 
 		// Card Size Control
@@ -270,8 +259,7 @@ export class GraphView extends ItemView {
 		cardSizeInput.max = "10";
 		cardSizeInput.value = this.cardRadius.toString();
 		cardSizeInput.className =
-			"w-full h-1 bg-gray-700 rounded-full appearance-none cursor-pointer accent-indigo-500";
-		cardSizeInput.style.width = "100%";
+			"w-full h-1 bg-gray-700 rounded-full appearance-none cursor-pointer accent-indigo-500 graph-view-range-input";
 		cardSizeContainer.appendChild(cardSizeInput);
 
 		// Text Color Control
@@ -315,8 +303,7 @@ export class GraphView extends ItemView {
 		const progressBar = document.createElement("div");
 		progressBar.id = "efProgressBar";
 		progressBar.className =
-			"flex flex-col justify-center transition-all duration-300 ease-out rounded-full shadow-none bg-gradient-to-r from-indigo-500 to-purple-500";
-		progressBar.style.width = "0%";
+			"flex flex-col justify-center transition-all duration-300 ease-out rounded-full shadow-none bg-gradient-to-r from-indigo-500 to-purple-500 graph-view-progress-bar";
 		progressBarContainer.appendChild(progressBar);
 
 		// Timeline labels
@@ -393,8 +380,7 @@ export class GraphView extends ItemView {
 		speedInput.max = "1000";
 		speedInput.value = (1050 - this.eventDuration).toString();
 		speedInput.className =
-			"w-full h-1 bg-gray-700 rounded-full appearance-none cursor-pointer accent-indigo-500";
-		speedInput.style.width = "100%";
+			"w-full h-1 bg-gray-700 rounded-full appearance-none cursor-pointer accent-indigo-500 graph-view-range-input";
 		speedContainer.appendChild(speedInput);
 
 		const speedLabels = document.createElement("div");
@@ -463,8 +449,8 @@ export class GraphView extends ItemView {
 			ratingGrid.appendChild(ratingContainer);
 
 			const colorDot = document.createElement("div");
-			colorDot.className = "w-3 h-3 rounded-full";
-			colorDot.style.backgroundColor = rating.color;
+			colorDot.className = "w-3 h-3 rounded-full graph-view-rating-dot";
+			colorDot.style.setProperty("--rating-color", rating.color);
 			ratingContainer.appendChild(colorDot);
 
 			const ratingValue = document.createElement("span");
@@ -491,16 +477,34 @@ export class GraphView extends ItemView {
 			toggleButton.addEventListener("click", () => {
 				isMinimized = !isMinimized;
 
-				controlsContent.style.display = isMinimized ? "none" : "block";
-
 				if (isMinimized) {
-					controlBox.style.width = "auto";
-					controlBox.style.padding = "0.5rem";
-					svg.style.transform = "rotate(180deg)";
+					controlsContent.classList.remove(
+						"graph-view-controls-content-visible"
+					);
+					controlsContent.classList.add(
+						"graph-view-controls-content-hidden"
+					);
+					controlBox.classList.remove(
+						"graph-view-control-box-expanded"
+					);
+					controlBox.classList.add(
+						"graph-view-control-box-minimized"
+					);
+					svg.classList.remove("graph-view-svg-expanded");
+					svg.classList.add("graph-view-svg-minimized");
 				} else {
-					controlBox.style.width = "16rem";
-					controlBox.style.padding = "0.75rem";
-					svg.style.transform = "rotate(0deg)";
+					controlsContent.classList.remove(
+						"graph-view-controls-content-hidden"
+					);
+					controlsContent.classList.add(
+						"graph-view-controls-content-visible"
+					);
+					controlBox.classList.remove(
+						"graph-view-control-box-minimized"
+					);
+					controlBox.classList.add("graph-view-control-box-expanded");
+					svg.classList.remove("graph-view-svg-minimized");
+					svg.classList.add("graph-view-svg-expanded");
 				}
 			});
 		}
@@ -705,7 +709,10 @@ export class GraphView extends ItemView {
 			const progressPercent =
 				((this.currentEventIndex + 1) / this.timelineEvents.length) *
 				100;
-			progressBar.style.width = `${progressPercent}%`;
+			progressBar.style.setProperty(
+				"--progress-width",
+				`${progressPercent}%`
+			);
 		}
 
 		if (this.timelineEvents.length > 0) {
