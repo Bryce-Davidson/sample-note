@@ -76,14 +76,6 @@
 		imagePreviewUrls = imagePreviewUrls.filter((_, i) => i !== index);
 	}
 
-	function autoResizeTextarea() {
-		if (!dialogText) return;
-
-		dialogText.style.height = "auto";
-		const newHeight = Math.min(200, dialogText.scrollHeight + 2);
-		dialogText.style.height = `${newHeight}px`;
-	}
-
 	function handleKeyDown(event: KeyboardEvent) {
 		if (event.key === "Enter" && !event.shiftKey) {
 			event.preventDefault();
@@ -106,8 +98,6 @@
 		imagePreviewUrls.forEach((url) => URL.revokeObjectURL(url));
 		imagePreviewUrls = [];
 
-		autoResizeTextarea();
-
 		dispatch("sendMessage", {
 			message: userMessage,
 			images: images,
@@ -118,10 +108,6 @@
 		if (abortController) {
 			abortController.abort();
 		}
-	}
-
-	$: if (dialogText) {
-		dialogText.addEventListener("input", autoResizeTextarea);
 	}
 
 	export function focusInput() {
@@ -151,7 +137,7 @@
 	<div class="relative flex items-end gap-2">
 		<textarea
 			bind:this={dialogText}
-			class="flex-1 p-3 backdrop-blur-sm bg-white/10 dark:bg-black/10 border border-white/20 dark:border-black/20 text-gray-700 dark:text-gray-300 rounded-lg resize-none transition-all duration-200 outline-none focus:outline focus:outline-2 focus:outline-blue-500 {currentAIStatus !==
+			class="chat-input-textarea flex-1 p-3 backdrop-blur-sm bg-white/10 dark:bg-black/10 border border-white/20 dark:border-black/20 text-gray-700 dark:text-gray-300 rounded-lg resize-none transition-all duration-200 outline-none focus:outline focus:outline-2 focus:outline-blue-500 {currentAIStatus !==
 			AIStatus.Idle
 				? 'opacity-75'
 				: ''}"
