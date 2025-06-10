@@ -229,11 +229,7 @@ export class DrawingCanvasView extends ItemView {
 
 		if (this.activeFilePath) {
 			const componentContainer = document.createElement("div");
-			componentContainer.style.width = "100%";
-			componentContainer.style.height = "100%";
-			componentContainer.style.display = "flex";
-			componentContainer.style.flexDirection = "column";
-			componentContainer.style.position = "relative";
+			componentContainer.addClass("drawing-canvas-container");
 			componentContainer.setAttribute("data-canvas-container", "true");
 			componentContainer.setAttribute("data-plugin", "sample-note");
 
