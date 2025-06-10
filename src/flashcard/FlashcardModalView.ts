@@ -42,15 +42,8 @@ export class SvelteFlashcardModal extends Modal {
 		const { contentEl, modalEl } = this;
 		contentEl.empty();
 
-		modalEl.style.maxWidth = "95vw";
-		modalEl.style.height = "100%";
-		modalEl.style.maxHeight = "85vh";
-		modalEl.style.borderRadius = "1.1em";
-		modalEl.style.padding = "1em";
-
-		contentEl.style.position = "relative";
-		contentEl.style.height = "100%";
-		contentEl.style.width = "100%";
+		modalEl.addClass("sample-note-flashcard-modal");
+		contentEl.addClass("sample-note-flashcard-modal-content");
 
 		this.component = new FlashcardModal({
 			target: contentEl,
