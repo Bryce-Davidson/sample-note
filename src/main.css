@@ -195,3 +195,66 @@
 .sample-note-occlusion-stage {
 	height: var(--occlusion-height, auto);
 }
+
+/* ============================
+   Occlusion Components
+=============================== */
+.occluded-image-container {
+	position: relative;
+	width: var(--occlusion-width, auto);
+	height: var(--occlusion-height, auto);
+}
+
+.occlusion-stage-container {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+}
+
+.occlusion-full-size-img {
+	width: 100%;
+	height: 100%;
+}
+
+.occlusion-interaction-disabled {
+	touch-action: auto;
+}
+
+.occlusion-interaction-enabled {
+	touch-action: none;
+}
+
+.occlusion-toggle-button {
+	position: absolute;
+	bottom: 10px;
+	right: 10px;
+	width: 16px;
+	height: 16px;
+	border-radius: 50%;
+	background-color: #4a6bf5;
+	color: white;
+	border: 2px solid white;
+	padding: 0;
+	margin: 0;
+	z-index: 1000;
+	cursor: pointer;
+	touch-action: manipulation;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+	font-size: 12px;
+	line-height: 16px;
+	text-align: center;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+/* Toggle button state colors */
+.occlusion-interaction-disabled .occlusion-toggle-button {
+	background-color: #4a6bf5; /* Blue when disabled */
+}
+
+.occlusion-interaction-enabled .occlusion-toggle-button {
+	background-color: #4caf50; /* Green when enabled */
+}

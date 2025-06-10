@@ -117,11 +117,13 @@ export class OcclusionManager {
 		const container = document.createElement("div");
 		container.classList.add("occluded-image-container");
 		container.classList.add("occlusion-interaction-disabled");
-		container.style.position = "relative";
 		const displayedWidth = imgElement.width || imgElement.clientWidth;
 		const displayedHeight = imgElement.height || imgElement.clientHeight;
-		container.style.width = displayedWidth + "px";
-		container.style.height = displayedHeight + "px";
+		container.style.setProperty("--occlusion-width", `${displayedWidth}px`);
+		container.style.setProperty(
+			"--occlusion-height",
+			`${displayedHeight}px`
+		);
 		container.setAttribute("data-file-path", key);
 		container.setAttribute("data-original-src", imgElement.src);
 		container.setAttribute("data-width", displayedWidth.toString());
@@ -132,8 +134,7 @@ export class OcclusionManager {
 			img.src = imgElement.src;
 			img.width = displayedWidth;
 			img.height = displayedHeight;
-			img.style.width = "100%";
-			img.style.height = "100%";
+			img.classList.add("occlusion-full-size-img");
 			container.appendChild(img);
 
 			this.addImageOcclusionHandlers(img, key);
@@ -166,11 +167,7 @@ export class OcclusionManager {
 		const img = new Image();
 
 		const stageContainer = document.createElement("div");
-		stageContainer.style.position = "absolute";
-		stageContainer.style.top = "0";
-		stageContainer.style.left = "0";
-		stageContainer.style.width = "100%";
-		stageContainer.style.height = "100%";
+		stageContainer.classList.add("occlusion-stage-container");
 		container.appendChild(stageContainer);
 
 		img.onload = () => {
@@ -274,7 +271,6 @@ export class OcclusionManager {
 				});
 
 				stage.listening(false);
-				container.style.touchAction = "auto";
 
 				shapeLayer.draw();
 			};
@@ -291,7 +287,6 @@ export class OcclusionManager {
 				});
 
 				stage.listening(true);
-				container.style.touchAction = "none";
 
 				shapeLayer.draw();
 			};
@@ -352,27 +347,6 @@ export class OcclusionManager {
 		while (toggleButton.firstChild) {
 			toggleButton.removeChild(toggleButton.firstChild);
 		}
-		toggleButton.style.position = "absolute";
-		toggleButton.style.bottom = "10px";
-		toggleButton.style.right = "10px";
-		toggleButton.style.width = "16px";
-		toggleButton.style.height = "16px";
-		toggleButton.style.borderRadius = "50%";
-		toggleButton.style.backgroundColor = "#4A6BF5";
-		toggleButton.style.color = "white";
-		toggleButton.style.border = "2px solid white";
-		toggleButton.style.padding = "0";
-		toggleButton.style.margin = "0";
-		toggleButton.style.zIndex = "1000";
-		toggleButton.style.cursor = "pointer";
-		toggleButton.style.touchAction = "manipulation";
-		toggleButton.style.boxShadow = "0 2px 4px rgba(0,0,0,0.2)";
-		toggleButton.style.fontSize = "12px";
-		toggleButton.style.lineHeight = "16px";
-		toggleButton.style.textAlign = "center";
-		toggleButton.style.display = "flex";
-		toggleButton.style.justifyContent = "center";
-		toggleButton.style.alignItems = "center";
 		container.appendChild(toggleButton);
 		return toggleButton;
 	}
@@ -425,8 +399,7 @@ export class OcclusionManager {
 				img.src = originalSrc;
 				img.width = width;
 				img.height = height;
-				img.style.width = "100%";
-				img.style.height = "100%";
+				img.classList.add("occlusion-full-size-img");
 				container.appendChild(img);
 				this.addImageOcclusionHandlers(img, filePath);
 			}
