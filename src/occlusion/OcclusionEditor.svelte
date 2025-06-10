@@ -343,6 +343,45 @@
 
 	let currentTransformCommand: TransformRectsCommand | null = null;
 
+	// Helper functions for cursor management
+	function setCursorClass(className: string) {
+		if (!konvaContainer) return;
+		// Remove all cursor classes
+		konvaContainer.classList.remove(
+			"cursor-grab",
+			"cursor-grabbing",
+			"cursor-crosshair",
+			"cursor-default",
+		);
+		// Add the new cursor class
+		if (className) {
+			konvaContainer.classList.add(className);
+		}
+	}
+
+	function removeCursorClasses() {
+		if (!konvaContainer) return;
+		konvaContainer.classList.remove(
+			"cursor-grab",
+			"cursor-grabbing",
+			"cursor-crosshair",
+			"cursor-default",
+		);
+	}
+
+	function getCurrentCursorClass(): string | null {
+		if (!konvaContainer) return null;
+		if (konvaContainer.classList.contains("cursor-grab"))
+			return "cursor-grab";
+		if (konvaContainer.classList.contains("cursor-grabbing"))
+			return "cursor-grabbing";
+		if (konvaContainer.classList.contains("cursor-crosshair"))
+			return "cursor-crosshair";
+		if (konvaContainer.classList.contains("cursor-default"))
+			return "cursor-default";
+		return null;
+	}
+
 	onMount(() => {
 		setTimeout(() => {
 			if (konvaContainer) {
@@ -467,6 +506,9 @@
 	});
 
 	onDestroy(() => {
+		// Remove any cursor classes when component is destroyed
+		removeCursorClasses();
+
 		if (stage) {
 			stage.off("wheel");
 			stage.off("pointerdown");
@@ -567,7 +609,7 @@
 					x: 0,
 					y: 0,
 				};
-				document.body.style.cursor = "grabbing";
+				setCursorClass("cursor-grabbing");
 				e.evt.preventDefault();
 				return;
 			}
@@ -621,12 +663,12 @@
 
 		stage.on("pointermove", (e) => {
 			if (isSpacePressed && !isPanning) {
-				document.body.style.cursor = "grab";
+				setCursorClass("cursor-grab");
 			}
 
 			if (isPanning) {
 				e.evt.preventDefault();
-				document.body.style.cursor = "grabbing";
+				setCursorClass("cursor-grabbing");
 				const currentPointerPosition = stage.getPointerPosition() || {
 					x: 0,
 					y: 0,
@@ -678,9 +720,9 @@
 		stage.on("pointerup", (e) => {
 			if (isPanning) {
 				isPanning = false;
-				document.body.style.cursor = isSpacePressed
-					? "grab"
-					: "default";
+				setCursorClass(
+					isSpacePressed ? "cursor-grab" : "cursor-default",
+				);
 			}
 
 			if (clickAndDragOcclusionMode && startPoint && tempRect) {
@@ -762,20 +804,20 @@
 		konvaContainer.addEventListener("pointerenter", () => {
 			isCanvasFocused = true;
 			if (isSpacePressed) {
-				document.body.style.cursor = isPanning ? "grabbing" : "grab";
+				setCursorClass(isPanning ? "cursor-grabbing" : "cursor-grab");
 			} else if (clickAndDragOcclusionMode) {
-				document.body.style.cursor = "crosshair";
+				setCursorClass("cursor-crosshair");
 			}
 		});
 
 		konvaContainer.addEventListener("pointerleave", () => {
 			isCanvasFocused = false;
 			if (
-				document.body.style.cursor === "grab" ||
-				document.body.style.cursor === "grabbing" ||
-				document.body.style.cursor === "crosshair"
+				getCurrentCursorClass() === "cursor-grab" ||
+				getCurrentCursorClass() === "cursor-grabbing" ||
+				getCurrentCursorClass() === "cursor-crosshair"
 			) {
-				document.body.style.cursor = "default";
+				removeCursorClasses();
 			}
 
 			if (isPanning) {
@@ -1275,7 +1317,7 @@
 		if (e.code === "Space" && !isInputFocused && isCanvasFocused) {
 			if (!isSpacePressed) {
 				isSpacePressed = true;
-				document.body.style.cursor = "grab";
+				setCursorClass("cursor-grab");
 
 				e.preventDefault();
 				e.stopPropagation();
@@ -1331,7 +1373,7 @@
 		if (e.code === "Space") {
 			isSpacePressed = false;
 			if (isCanvasFocused) {
-				document.body.style.cursor = "default";
+				removeCursorClasses();
 				e.preventDefault();
 				e.stopPropagation();
 			}
@@ -1541,10 +1583,10 @@
 		startPoint = null;
 
 		if (clickAndDragOcclusionMode && isCanvasFocused) {
-			document.body.style.cursor = "crosshair";
+			setCursorClass("cursor-crosshair");
 			new Notice("Click and drag to create occlusions");
 		} else if (!isSpacePressed) {
-			document.body.style.cursor = "default";
+			removeCursorClasses();
 		}
 	}
 

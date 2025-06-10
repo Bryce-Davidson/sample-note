@@ -22,3 +22,24 @@
 	bottom: 0;
 	overflow: hidden;
 }
+
+/* Cursor styles for Occlusion Editor - Applied to konvaContainer */
+.cursor-grab,
+.cursor-grab * {
+	cursor: grab !important;
+}
+
+.cursor-grabbing,
+.cursor-grabbing * {
+	cursor: grabbing !important;
+}
+
+.cursor-crosshair,
+.cursor-crosshair * {
+	cursor: crosshair !important;
+}
+
+.cursor-default,
+.cursor-default * {
+	cursor: default !important;
+}
