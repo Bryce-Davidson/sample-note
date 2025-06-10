@@ -62,7 +62,11 @@
 							img.naturalHeight / img.naturalWidth;
 						const containerHeight = containerWidth * aspectRatio;
 
-						stageContainer.style.height = `${containerHeight}px`;
+						stageContainer.addClass("sample-note-occlusion-stage");
+						stageContainer.style.setProperty(
+							"--occlusion-height",
+							`${containerHeight}px`,
+						);
 
 						stage = new Konva.Stage({
 							container: stageContainer,
@@ -243,7 +247,10 @@
 				stage.width(newWidth);
 				stage.height(newHeight);
 
-				stageContainer.style.height = `${newHeight}px`;
+				stageContainer.style.setProperty(
+					"--occlusion-height",
+					`${newHeight}px`,
+				);
 
 				kImage.width(newWidth);
 				kImage.height(newHeight);

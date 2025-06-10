@@ -188,3 +188,10 @@
 .sample-note-flashcard-temp-visible {
 	display: block;
 }
+
+/* ============================
+   Occlusion Stage Container
+=============================== */
+.sample-note-occlusion-stage {
+	height: var(--occlusion-height, auto);
+}
