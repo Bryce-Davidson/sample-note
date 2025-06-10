@@ -81,7 +81,7 @@
 
 		const tempContainer = document.createElement("div");
 		tempContainer.setAttribute("data-flashcard-content", "true");
-		tempContainer.style.display = "none";
+		tempContainer.addClass("sample-note-flashcard-temp-hidden");
 
 		if (currentComponent) {
 			currentComponent.$destroy();
@@ -118,7 +118,12 @@
 					while (contentWrapper.firstChild) {
 						contentWrapper.removeChild(contentWrapper.firstChild);
 					}
-					tempContainer.style.display = "";
+					tempContainer.removeClass(
+						"sample-note-flashcard-temp-hidden",
+					);
+					tempContainer.addClass(
+						"sample-note-flashcard-temp-visible",
+					);
 					contentWrapper.appendChild(tempContainer);
 				}
 			} else {
@@ -150,7 +155,8 @@
 				while (contentWrapper.firstChild) {
 					contentWrapper.removeChild(contentWrapper.firstChild);
 				}
-				tempContainer.style.display = "";
+				tempContainer.removeClass("sample-note-flashcard-temp-hidden");
+				tempContainer.addClass("sample-note-flashcard-temp-visible");
 				contentWrapper.appendChild(tempContainer);
 			}
 		} catch (renderError) {

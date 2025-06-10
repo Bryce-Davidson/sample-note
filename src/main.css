@@ -177,3 +177,14 @@
 	top: 0;
 	bottom: unset;
 }
+
+/* ============================
+   Flashcard Temp Container
+=============================== */
+.sample-note-flashcard-temp-hidden {
+	display: none;
+}
+
+.sample-note-flashcard-temp-visible {
+	display: block;
+}
