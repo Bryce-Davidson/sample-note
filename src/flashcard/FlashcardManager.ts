@@ -87,13 +87,42 @@ export class FlashcardManager {
 			return;
 		}
 		let flashcards = await this.syncFlashcardsForFile(activeFile);
-		if (this.plugin.settings.randomizeFlashcards) {
-			flashcards = shuffleArray(flashcards);
+
+		// Add hide group child cards
+		const allFlashcards: Flashcard[] = [...flashcards];
+		const fileCards = this.plugin.notes[activeFile.path]?.cards || {};
+
+		for (const cardUUID in fileCards) {
+			const card = fileCards[cardUUID];
+			// Check if this is a hide group child card
+			if (card.parentCardUUID && card.hideGroupId) {
+				// Check if the parent card exists in our flashcards array
+				const parentExists = flashcards.some(
+					(f) => f.uuid === card.parentCardUUID
+				);
+				if (parentExists) {
+					allFlashcards.push({
+						uuid: cardUUID,
+						content: card.cardContent,
+						noteTitle: activeFile.basename,
+						filePath: activeFile.path,
+						cardTitle: card.cardTitle,
+						line: card.line,
+						nextReviewDate: card.nextReviewDate,
+						ef: card.ef,
+					});
+				}
+			}
 		}
-		if (flashcards.length > 0) {
+
+		if (this.plugin.settings.randomizeFlashcards) {
+			allFlashcards.sort(() => Math.random() - 0.5);
+		}
+
+		if (allFlashcards.length > 0) {
 			createFlashcardModal(
 				this.plugin.app,
-				flashcards,
+				allFlashcards,
 				this.plugin,
 				true
 			).open();
@@ -478,6 +507,103 @@ export class FlashcardManager {
 								);
 							}
 						}
+					}
+
+					// Check for hide groups in the card content
+					const hideGroupRegex = /\[hide=(\d+)\]/g;
+					const hideGroups = new Set<string>();
+					let hideMatch;
+					while (
+						(hideMatch = hideGroupRegex.exec(flashcard.content)) !==
+						null
+					) {
+						hideGroups.add(hideMatch[1]);
+					}
+
+					// Create child cards for each hide group
+					if (hideGroups.size > 0) {
+						hideGroups.forEach((groupId) => {
+							const childCardUUID = `${cardUUID}_hidegroup_${groupId}`;
+							allValidChildCardUUIDs.push(childCardUUID);
+
+							if (!fileCards[childCardUUID]) {
+								newCardAdded = true;
+								fileCards[childCardUUID] = {
+									cardUUID: childCardUUID,
+									cardContent: flashcard.content,
+									repetition: 0,
+									interval: 0,
+									ef: 2.5,
+									lastReviewDate: now,
+									createdAt: now,
+									nextReviewDate: addMinutes(
+										new Date(now),
+										LEARNING_STEPS[0]
+									).toISOString(),
+									active: true,
+									efHistory: [
+										{
+											timestamp: now,
+											ef: 2.5,
+											rating: 3,
+										},
+									],
+									cardTitle: `${flashcard.cardTitle} (Group ${groupId})`,
+									line: flashcard.line,
+									parentCardUUID: cardUUID,
+									hideGroupId: groupId,
+								};
+								new Notice(
+									`Hide group flashcard "${
+										(flashcard.cardTitle || "").length > 15
+											? (
+													flashcard.cardTitle || ""
+											  ).substring(0, 15) + "..."
+											: flashcard.cardTitle || "Untitled"
+									} (Group ${groupId})" created.`
+								);
+							} else {
+								const existingChildCard =
+									fileCards[childCardUUID];
+								const childContentChanged =
+									existingChildCard.cardContent !==
+									flashcard.content;
+								const childTitleChanged =
+									existingChildCard.cardTitle !==
+									`${flashcard.cardTitle} (Group ${groupId})`;
+
+								if (
+									childContentChanged ||
+									childTitleChanged ||
+									existingChildCard.line !== flashcard.line
+								) {
+									newCardAdded = true;
+									existingChildCard.cardContent =
+										flashcard.content;
+									existingChildCard.cardTitle = `${flashcard.cardTitle} (Group ${groupId})`;
+									existingChildCard.line = flashcard.line;
+									existingChildCard.hideGroupId = groupId;
+
+									if (
+										childContentChanged ||
+										childTitleChanged
+									) {
+										new Notice(
+											`Hide group flashcard "${
+												(flashcard.cardTitle || "")
+													.length > 15
+													? (
+															flashcard.cardTitle ||
+															""
+													  ).substring(0, 15) + "..."
+													: flashcard.cardTitle ||
+													  "Untitled"
+											} (Group ${groupId})" updated.`
+										);
+									}
+								}
+							}
+						});
 					}
 
 					if (!existingUUID) {

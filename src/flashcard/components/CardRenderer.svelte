@@ -46,21 +46,31 @@
 	function processHideGroups(rootEl: HTMLElement, hideGroupId?: string) {
 		if (!hideGroupId) return;
 
-		const flashcardContainer =
-			rootEl.querySelector("[data-flashcard-content]") || rootEl;
-		const groupElements = flashcardContainer.querySelectorAll(
-			"[data-hidable-element][data-group-hide]",
+		// Find all hide elements with groups
+		const groupElements = rootEl.querySelectorAll(
+			".sample-note-hidable-element.group-hide",
 		);
-		const nonGroupElements = flashcardContainer.querySelectorAll(
-			"[data-hidable-element]:not([data-group-hide])",
+		// Find all hide elements without groups
+		const nonGroupElements = rootEl.querySelectorAll(
+			".sample-note-hidable-element:not(.group-hide)",
 		);
 
+		// Show only the specified hide group, hide all others
 		groupElements.forEach((el) => {
 			const group = el.getAttribute("data-group");
-			el.classList.toggle("hidden", group === hideGroupId);
+			if (group === hideGroupId) {
+				// Show this group
+				el.classList.remove("sample-note-is-hidden");
+			} else {
+				// Hide other groups
+				el.classList.add("sample-note-is-hidden");
+			}
 		});
 
-		nonGroupElements.forEach((el) => el.classList.remove("hidden"));
+		// Hide all non-group hide elements
+		nonGroupElements.forEach((el) => {
+			el.classList.add("sample-note-is-hidden");
+		});
 	}
 
 	function cleanup() {
@@ -135,8 +145,10 @@
 					plugin,
 				);
 
-				processCustomHiddenText(tempContainer);
+				// Process all hidden text first to create the hide elements
+				processCustomHiddenText(tempContainer, false);
 
+				// Then apply hide group visibility if this is a hide group card
 				if (cardStateAndFile?.card.hideGroupId) {
 					processHideGroups(
 						tempContainer,
