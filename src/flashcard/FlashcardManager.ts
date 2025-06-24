@@ -295,41 +295,7 @@ export class FlashcardManager {
 			}
 		} catch (error) {
 			loadingNotice.hide();
-
-			let errorMessage = "Error preparing flashcards: ";
-
-			if (error instanceof Error) {
-				if (
-					error.message.includes("ENOENT") ||
-					error.message.includes("not found")
-				) {
-					errorMessage =
-						"Some flashcard files could not be found. They may have been moved or deleted.";
-				} else if (
-					error.message.includes("permission") ||
-					error.message.includes("EACCES")
-				) {
-					errorMessage =
-						"Permission denied: Cannot access some flashcard files.";
-				} else if (
-					error.message.includes("parse") ||
-					error.message.includes("syntax")
-				) {
-					errorMessage =
-						"Some files contain invalid syntax that prevents loading flashcards.";
-				} else if (
-					error.message.includes("memory") ||
-					error.message.includes("heap")
-				) {
-					errorMessage =
-						"Too many flashcards to load at once. Try reviewing fewer cards.";
-				} else {
-					errorMessage += error.message;
-				}
-			} else {
-				errorMessage += String(error);
-			}
-
+			const errorMessage = formatFlashcardLoadError(error);
 			new Notice(errorMessage);
 			console.error("Error in showAllDueFlashcardsModal:", error);
 		}
@@ -445,160 +411,111 @@ export class FlashcardManager {
 
 					if (!fileCards[flashcard.uuid]) {
 						newCardAdded = true;
-						fileCards[flashcard.uuid] = {
-							cardUUID: flashcard.uuid,
-							cardContent: flashcard.content,
-							repetition: 0,
-							interval: 0,
-							ef: 2.5,
-							lastReviewDate: now,
-							createdAt: now,
-							nextReviewDate: addMinutes(
-								new Date(now),
-								LEARNING_STEPS[0]
-							).toISOString(),
-							active: true,
-							efHistory: [
-								{
-									timestamp: now,
-									ef: 2.5,
-									rating: 3,
-								},
-							],
-							cardTitle: flashcard.cardTitle,
-							line: flashcard.line,
-						};
+						fileCards[flashcard.uuid] = createDefaultCardState(
+							flashcard.uuid,
+							flashcard.content,
+							flashcard.cardTitle,
+							flashcard.line,
+							now
+						);
 						new Notice(
-							`Flashcard "${
-								(flashcard.cardTitle || "").length > 20
-									? (flashcard.cardTitle || "").substring(
-											0,
-											20
-									  ) + "..."
-									: flashcard.cardTitle || "Untitled"
-							}" created.`
+							`Flashcard "${truncateCardTitle(
+								flashcard.cardTitle
+							)}" created.`
 						);
 					} else {
 						const existingCard = fileCards[flashcard.uuid];
-						const contentChanged =
-							existingCard.cardContent !== flashcard.content;
-						const titleChanged =
-							existingCard.cardTitle !== flashcard.cardTitle;
-
 						if (
-							contentChanged ||
-							titleChanged ||
-							existingCard.line !== flashcard.line
+							hasCardChanged(
+								existingCard,
+								flashcard.content,
+								flashcard.cardTitle,
+								flashcard.line
+							)
 						) {
 							newCardAdded = true;
-							existingCard.cardContent = flashcard.content;
-							existingCard.cardTitle = flashcard.cardTitle;
-							existingCard.line = flashcard.line;
+							const contentOrTitleChanged =
+								existingCard.cardContent !==
+									flashcard.content ||
+								existingCard.cardTitle !== flashcard.cardTitle;
 
-							if (contentChanged || titleChanged) {
+							updateExistingCard(
+								existingCard,
+								flashcard.content,
+								flashcard.cardTitle,
+								flashcard.line
+							);
+
+							if (contentOrTitleChanged) {
 								new Notice(
-									`Flashcard "${
-										(flashcard.cardTitle || "").length > 20
-											? (
-													flashcard.cardTitle || ""
-											  ).substring(0, 20) + "..."
-											: flashcard.cardTitle || "Untitled"
-									}" updated.`
+									`Flashcard "${truncateCardTitle(
+										flashcard.cardTitle
+									)}" updated.`
 								);
 							}
 						}
 					}
 
 					// Check for hide groups in the card content
-					const hideGroupRegex = /\[hide=(\d+)\]/g;
-					const hideGroups = new Set<string>();
-					let hideMatch;
-					while (
-						(hideMatch = hideGroupRegex.exec(flashcard.content)) !==
-						null
-					) {
-						hideGroups.add(hideMatch[1]);
-					}
+					const hideGroups = extractHideGroups(flashcard.content);
 
 					// Create child cards for each hide group
 					if (hideGroups.size > 0) {
 						hideGroups.forEach((groupId) => {
 							const childCardUUID = `${cardUUID}_hidegroup_${groupId}`;
 							allValidChildCardUUIDs.push(childCardUUID);
+							const childTitle = `${flashcard.cardTitle} (Group ${groupId})`;
 
 							if (!fileCards[childCardUUID]) {
 								newCardAdded = true;
-								fileCards[childCardUUID] = {
-									cardUUID: childCardUUID,
-									cardContent: flashcard.content,
-									repetition: 0,
-									interval: 0,
-									ef: 2.5,
-									lastReviewDate: now,
-									createdAt: now,
-									nextReviewDate: addMinutes(
-										new Date(now),
-										LEARNING_STEPS[0]
-									).toISOString(),
-									active: true,
-									efHistory: [
-										{
-											timestamp: now,
-											ef: 2.5,
-											rating: 3,
-										},
-									],
-									cardTitle: `${flashcard.cardTitle} (Group ${groupId})`,
-									line: flashcard.line,
-									parentCardUUID: cardUUID,
-									hideGroupId: groupId,
-								};
+								fileCards[childCardUUID] =
+									createDefaultCardState(
+										childCardUUID,
+										flashcard.content,
+										childTitle,
+										flashcard.line,
+										now,
+										cardUUID,
+										groupId
+									);
 								new Notice(
-									`Hide group flashcard "${
-										(flashcard.cardTitle || "").length > 15
-											? (
-													flashcard.cardTitle || ""
-											  ).substring(0, 15) + "..."
-											: flashcard.cardTitle || "Untitled"
-									} (Group ${groupId})" created.`
+									`Hide group flashcard "${truncateCardTitle(
+										flashcard.cardTitle,
+										15
+									)} (Group ${groupId})" created.`
 								);
 							} else {
 								const existingChildCard =
 									fileCards[childCardUUID];
-								const childContentChanged =
-									existingChildCard.cardContent !==
-									flashcard.content;
-								const childTitleChanged =
-									existingChildCard.cardTitle !==
-									`${flashcard.cardTitle} (Group ${groupId})`;
-
 								if (
-									childContentChanged ||
-									childTitleChanged ||
-									existingChildCard.line !== flashcard.line
+									hasCardChanged(
+										existingChildCard,
+										flashcard.content,
+										childTitle,
+										flashcard.line
+									)
 								) {
 									newCardAdded = true;
-									existingChildCard.cardContent =
-										flashcard.content;
-									existingChildCard.cardTitle = `${flashcard.cardTitle} (Group ${groupId})`;
-									existingChildCard.line = flashcard.line;
-									existingChildCard.hideGroupId = groupId;
+									const contentOrTitleChanged =
+										existingChildCard.cardContent !==
+											flashcard.content ||
+										existingChildCard.cardTitle !==
+											childTitle;
 
-									if (
-										childContentChanged ||
-										childTitleChanged
-									) {
+									updateExistingCard(
+										existingChildCard,
+										flashcard.content,
+										childTitle,
+										flashcard.line,
+										groupId
+									);
+
+									if (contentOrTitleChanged) {
 										new Notice(
-											`Hide group flashcard "${
-												(flashcard.cardTitle || "")
-													.length > 15
-													? (
-															flashcard.cardTitle ||
-															""
-													  ).substring(0, 15) + "..."
-													: flashcard.cardTitle ||
-													  "Untitled"
-											} (Group ${groupId})" updated.`
+											`Hide group flashcard "${truncateCardTitle(
+												flashcard.cardTitle,
+												15
+											)} (Group ${groupId})" updated.`
 										);
 									}
 								}
@@ -624,14 +541,9 @@ export class FlashcardManager {
 					delete fileCards[cardUUID];
 					newCardAdded = true;
 					new Notice(
-						`Flashcard "${
-							(deletedCard.cardTitle || "").length > 20
-								? (deletedCard.cardTitle || "").substring(
-										0,
-										20
-								  ) + "..."
-								: deletedCard.cardTitle || "Untitled"
-						}" deleted.`
+						`Flashcard "${truncateCardTitle(
+							deletedCard.cardTitle
+						)}" deleted.`
 					);
 				}
 			}
@@ -649,46 +561,7 @@ export class FlashcardManager {
 		} catch (error) {
 			console.error("Error syncing flashcards:", error);
 
-			let errorMessage = `Error syncing flashcards in "${file.name}": `;
-
-			if (error instanceof Error) {
-				if (
-					Platform.isMobile &&
-					(error.message.includes("correct format") ||
-						error.message.includes("couldn't be opened") ||
-						error.message.includes("format"))
-				) {
-					errorMessage = `File encoding issue detected in "${file.name}". The file may contain special characters that cannot be read on mobile. Try editing and saving the file again.`;
-				} else if (
-					error.message.includes("ENOENT") ||
-					error.message.includes("not found")
-				) {
-					errorMessage = `File "${file.name}" not found or cannot be accessed.`;
-				} else if (
-					error.message.includes("permission") ||
-					error.message.includes("EACCES")
-				) {
-					errorMessage = `Permission denied: Cannot read or modify "${file.name}".`;
-				} else if (error.message.includes("EISDIR")) {
-					errorMessage = `Cannot sync flashcards: "${file.name}" is a directory, not a file.`;
-				} else if (
-					error.message.includes("parse") ||
-					error.message.includes("syntax")
-				) {
-					errorMessage = `File "${file.name}" contains invalid syntax that prevents flashcard parsing.`;
-				} else if (
-					Platform.isMobile &&
-					error.message.includes(
-						"Unable to read file after multiple attempts"
-					)
-				) {
-					errorMessage = `Unable to access "${file.name}" on mobile. Please ensure the file is synced and try again.`;
-				} else {
-					errorMessage += error.message;
-				}
-			} else {
-				errorMessage += String(error);
-			}
+			let errorMessage = formatSyncErrorMessage(error, file.name);
 
 			new Notice(errorMessage);
 			return [];
@@ -995,6 +868,171 @@ export {
 
 export const BATCH_SIZE = 10;
 export const LEARNING_STEPS = [1, 10, 60, 1440, 10080];
+
+// Helper function to create a default card state
+function createDefaultCardState(
+	cardUUID: string,
+	content: string,
+	title: string | undefined,
+	line: number | undefined,
+	now: string,
+	parentCardUUID?: string,
+	hideGroupId?: string
+): CardState {
+	return {
+		cardUUID,
+		cardContent: content,
+		repetition: 0,
+		interval: 0,
+		ef: 2.5,
+		lastReviewDate: now,
+		createdAt: now,
+		nextReviewDate: addMinutes(
+			new Date(now),
+			LEARNING_STEPS[0]
+		).toISOString(),
+		active: true,
+		efHistory: [
+			{
+				timestamp: now,
+				ef: 2.5,
+				rating: 3,
+			},
+		],
+		cardTitle: title,
+		line,
+		...(parentCardUUID && { parentCardUUID }),
+		...(hideGroupId && { hideGroupId }),
+	};
+}
+
+// Helper function to truncate card titles for notices
+function truncateCardTitle(
+	title: string | undefined,
+	maxLength: number = 20
+): string {
+	return title && title.length > maxLength
+		? title.substring(0, maxLength) + "..."
+		: title || "Untitled";
+}
+
+// Helper function to check if card needs updating
+function hasCardChanged(
+	existingCard: CardState,
+	newContent: string,
+	newTitle: string | undefined,
+	newLine: number | undefined
+): boolean {
+	return (
+		existingCard.cardContent !== newContent ||
+		existingCard.cardTitle !== newTitle ||
+		existingCard.line !== newLine
+	);
+}
+
+// Helper function to update existing card
+function updateExistingCard(
+	existingCard: CardState,
+	newContent: string,
+	newTitle: string | undefined,
+	newLine: number | undefined,
+	hideGroupId?: string
+): void {
+	existingCard.cardContent = newContent;
+	existingCard.cardTitle = newTitle;
+	existingCard.line = newLine;
+	if (hideGroupId) {
+		existingCard.hideGroupId = hideGroupId;
+	}
+}
+
+// Helper function to extract hide groups from content
+function extractHideGroups(content: string): Set<string> {
+	const hideGroupRegex = /\[hide=(\d+)\]/g;
+	const hideGroups = new Set<string>();
+	let match;
+	while ((match = hideGroupRegex.exec(content)) !== null) {
+		hideGroups.add(match[1]);
+	}
+	return hideGroups;
+}
+
+// Helper function to format sync error messages
+function formatSyncErrorMessage(error: unknown, fileName: string): string {
+	let errorMessage = `Error syncing flashcards in "${fileName}": `;
+
+	if (error instanceof Error) {
+		if (
+			Platform.isMobile &&
+			(error.message.includes("correct format") ||
+				error.message.includes("couldn't be opened") ||
+				error.message.includes("format"))
+		) {
+			return `File encoding issue detected in "${fileName}". The file may contain special characters that cannot be read on mobile. Try editing and saving the file again.`;
+		} else if (
+			error.message.includes("ENOENT") ||
+			error.message.includes("not found")
+		) {
+			return `File "${fileName}" not found or cannot be accessed.`;
+		} else if (
+			error.message.includes("permission") ||
+			error.message.includes("EACCES")
+		) {
+			return `Permission denied: Cannot read or modify "${fileName}".`;
+		} else if (error.message.includes("EISDIR")) {
+			return `Cannot sync flashcards: "${fileName}" is a directory, not a file.`;
+		} else if (
+			error.message.includes("parse") ||
+			error.message.includes("syntax")
+		) {
+			return `File "${fileName}" contains invalid syntax that prevents flashcard parsing.`;
+		} else if (
+			Platform.isMobile &&
+			error.message.includes(
+				"Unable to read file after multiple attempts"
+			)
+		) {
+			return `Unable to access "${fileName}" on mobile. Please ensure the file is synced and try again.`;
+		} else {
+			return errorMessage + error.message;
+		}
+	} else {
+		return errorMessage + String(error);
+	}
+}
+
+// Helper function to format flashcard loading errors
+function formatFlashcardLoadError(error: unknown): string {
+	let errorMessage = "Error preparing flashcards: ";
+
+	if (error instanceof Error) {
+		if (
+			error.message.includes("ENOENT") ||
+			error.message.includes("not found")
+		) {
+			return "Some flashcard files could not be found. They may have been moved or deleted.";
+		} else if (
+			error.message.includes("permission") ||
+			error.message.includes("EACCES")
+		) {
+			return "Permission denied: Cannot access some flashcard files.";
+		} else if (
+			error.message.includes("parse") ||
+			error.message.includes("syntax")
+		) {
+			return "Some files contain invalid syntax that prevents loading flashcards.";
+		} else if (
+			error.message.includes("memory") ||
+			error.message.includes("heap")
+		) {
+			return "Too many flashcards to load at once. Try reviewing fewer cards.";
+		} else {
+			return errorMessage + error.message;
+		}
+	} else {
+		return errorMessage + String(error);
+	}
+}
 
 export function shuffleArray<T>(array: T[]): T[] {
 	const newArray = [...array];
