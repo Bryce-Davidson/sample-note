@@ -55,21 +55,21 @@
 			".sample-note-hidable-element:not(.group-hide)",
 		);
 
-		// Show only the specified hide group, hide all others
+		// Hide the specified hide group, show all others
 		groupElements.forEach((el) => {
 			const group = el.getAttribute("data-group");
 			if (group === hideGroupId) {
-				// Show this group
-				el.classList.remove("sample-note-is-hidden");
-			} else {
-				// Hide other groups
+				// Hide this group (user should recall it)
 				el.classList.add("sample-note-is-hidden");
+			} else {
+				// Show other groups (provide context)
+				el.classList.remove("sample-note-is-hidden");
 			}
 		});
 
-		// Hide all non-group hide elements
+		// Show all non-group hide elements (provide context)
 		nonGroupElements.forEach((el) => {
-			el.classList.add("sample-note-is-hidden");
+			el.classList.remove("sample-note-is-hidden");
 		});
 	}
 
