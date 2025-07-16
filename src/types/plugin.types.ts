@@ -14,6 +14,7 @@ export interface NoteMetadata {
 	noteVisitLog: string[];
 	occlusion?: OcclusionShape[];
 	drawing?: DrawingData;
+	tags?: string[];
 }
 
 export interface DrawingData {

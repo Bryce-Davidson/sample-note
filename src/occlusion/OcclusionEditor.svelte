@@ -12,6 +12,7 @@
 	import ToolsRow from "./components/ToolsRow.svelte";
 	import EditorControls from "./components/EditorControls.svelte";
 	import FileSelection from "./components/FileSelection.svelte";
+	import TagManager from "./components/TagManager.svelte";
 
 	export let plugin: any;
 	export let selectedFilePath = "";
@@ -55,6 +56,10 @@
 
 	let selectedOcclusioncards: CardState[] = [];
 	let flashcardInfoVisible = false;
+
+	// Tag management
+	let imageTags: string[] = [];
+	let allAvailableTags: Set<string> = new Set();
 
 	interface CardStatusStyles {
 		liClass: string;
@@ -1042,6 +1047,13 @@
 
 	function loadSavedShapes(filePath: string) {
 		const shapes = plugin.notes[filePath]?.data.occlusion || [];
+		const tags = plugin.notes[filePath]?.data.tags || [];
+
+		// Load tags for this image
+		imageTags = Array.isArray(tags) ? tags : [];
+
+		// Update available tags
+		allAvailableTags = collectAllAvailableTags();
 
 		shapes.forEach((s: any) => {
 			const rect = createRectangle({
@@ -1260,6 +1272,14 @@
 
 			plugin.notes[selectedFilePath].data.occlusion = shapes;
 
+			// Save tags
+			if (imageTags.length > 0) {
+				plugin.notes[selectedFilePath].data.tags = imageTags;
+			} else {
+				// Remove tags property if no tags
+				delete plugin.notes[selectedFilePath].data.tags;
+			}
+
 			await plugin.savePluginData();
 
 			refreshReadingViews();
@@ -1272,6 +1292,11 @@
 				new Notice("Occlusion data saved!");
 			} else {
 				console.log("Auto-save completed");
+			}
+
+			// Refresh the review queue to update tag filtering
+			if (typeof plugin.refreshUnifiedQueue === "function") {
+				plugin.refreshUnifiedQueue();
 			}
 		} catch (error) {
 			console.error(
@@ -1732,10 +1757,50 @@
 		}
 		return true;
 	}
+
+	function collectAllAvailableTags() {
+		const tempTags = new Set<string>();
+
+		// Collect tags from markdown files
+		for (const notePath in plugin.notes) {
+			if (notePath.endsWith(".md")) {
+				const file = plugin.app.vault.getAbstractFileByPath(notePath);
+				if (file && file instanceof TFile) {
+					const fileCache =
+						plugin.app.metadataCache.getFileCache(file);
+					const tags = fileCache?.frontmatter?.tags;
+					if (tags) {
+						if (Array.isArray(tags)) {
+							tags.forEach((tag: string) => tempTags.add(tag));
+						} else {
+							tempTags.add(tags);
+						}
+					}
+				}
+			}
+		}
+
+		// Collect tags from image files with occlusion data
+		for (const notePath in plugin.notes) {
+			if (notePath.match(/\.(png|jpe?g|gif)$/i)) {
+				const tags = plugin.notes[notePath]?.data?.tags;
+				if (tags && Array.isArray(tags)) {
+					tags.forEach((tag: string) => tempTags.add(tag));
+				}
+			}
+		}
+
+		return tempTags;
+	}
+
+	function handleTagsChange(event: CustomEvent<string[]>) {
+		imageTags = event.detail;
+		hasUnsavedChanges = true;
+	}
 </script>
 
 <div
-	class="flex flex-col h-full occlusion-editor bg-gray-50 dark:bg-gray-800"
+	class="flex flex-col h-full bg-gray-50 occlusion-editor dark:bg-gray-800"
 	bind:this={containerEl}
 >
 	<!-- Toolbar -->
@@ -1744,7 +1809,7 @@
 	>
 		<!-- File row -->
 		<div
-			class="flex flex-col items-center justify-between gap-2 p-2 mb-2 border-b border-gray-100 sm:flex-row dark:border-gray-700"
+			class="flex flex-col gap-2 justify-between items-center p-2 mb-2 border-b border-gray-100 sm:flex-row dark:border-gray-700"
 		>
 			<!-- Left: File selection -->
 			<FileSelection
@@ -1772,13 +1837,22 @@
 			onToggleClickAndDragMode={toggleClickAndDragOcclusionMode}
 			onUpdateSelectedRectangleColor={updateSelectedRectangleColor}
 		/>
+
+		<!-- Tag Manager -->
+		<div class="px-4 py-2 border-t border-gray-100 dark:border-gray-700">
+			<TagManager
+				bind:tags={imageTags}
+				{allAvailableTags}
+				on:change={handleTagsChange}
+			/>
+		</div>
 	</div>
 
 	<!-- Main content area with relative positioning -->
 	<div class="relative flex-1">
 		<!-- Konva Container - Full height now -->
 		<div
-			class="absolute inset-0 overflow-auto bg-white border border-gray-300 dark:border-gray-600 dark:bg-gray-900"
+			class="overflow-auto absolute inset-0 bg-white border border-gray-300 dark:border-gray-600 dark:bg-gray-900"
 			bind:this={konvaContainer}
 		></div>
 

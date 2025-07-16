@@ -53,6 +53,7 @@
 	function fileHasTag(filePath: string, tagToCheck: string) {
 		if (tagToCheck === "all") return true;
 
+		// Check if it's a markdown file with frontmatter tags
 		const file = plugin.app.vault.getAbstractFileByPath(filePath);
 		if (file && file instanceof TFile) {
 			const fileCache = plugin.app.metadataCache.getFileCache(file);
@@ -63,6 +64,15 @@
 					: tags === tagToCheck;
 			}
 		}
+
+		// Check if it's an image file with tags in plugin data
+		if (filePath.match(/\.(png|jpe?g|gif)$/i)) {
+			const imageTags = plugin.notes[filePath]?.data?.tags;
+			if (imageTags && Array.isArray(imageTags)) {
+				return imageTags.includes(tagToCheck);
+			}
+		}
+
 		return false;
 	}
 
@@ -77,16 +87,28 @@
 				continue; // Skip files with no flashcards
 			}
 
-			const file = plugin.app.vault.getAbstractFileByPath(notePath);
-			if (file && file instanceof TFile) {
-				const fileCache = plugin.app.metadataCache.getFileCache(file);
-				const tags = fileCache?.frontmatter?.tags;
-				if (tags) {
-					if (Array.isArray(tags)) {
-						tags.forEach((tag) => tempTags.add(tag));
-					} else {
-						tempTags.add(tags);
+			// Check markdown files for frontmatter tags
+			if (notePath.endsWith(".md")) {
+				const file = plugin.app.vault.getAbstractFileByPath(notePath);
+				if (file && file instanceof TFile) {
+					const fileCache =
+						plugin.app.metadataCache.getFileCache(file);
+					const tags = fileCache?.frontmatter?.tags;
+					if (tags) {
+						if (Array.isArray(tags)) {
+							tags.forEach((tag) => tempTags.add(tag));
+						} else {
+							tempTags.add(tags);
+						}
 					}
+				}
+			}
+
+			// Check image files for tags in plugin data
+			if (notePath.match(/\.(png|jpe?g|gif)$/i)) {
+				const tags = noteData.data?.tags;
+				if (tags && Array.isArray(tags)) {
+					tags.forEach((tag) => tempTags.add(tag));
 				}
 			}
 		}
