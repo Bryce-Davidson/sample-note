@@ -26,3 +26,4 @@ data.json
 .DS_Store
 
 node_modules.nosync
+CLAUDE.md

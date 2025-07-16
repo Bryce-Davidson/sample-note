@@ -151,12 +151,36 @@
 	max-height: 85vh;
 	border-radius: 1.1em;
 	padding: 1em;
+	box-sizing: border-box;
+}
+
+/* Ensure modal respects mobile viewport */
+@media (max-width: 768px) {
+	.sample-note-flashcard-modal {
+		max-width: calc(100vw - 2em);
+		max-height: calc(100vh - 4em);
+		margin: 1em;
+	}
+}
+
+/* Small mobile devices */
+@media (max-width: 480px) {
+	.sample-note-flashcard-modal {
+		max-width: 100vw;
+		max-height: 100vh;
+		margin: 0;
+		border-radius: 0;
+		padding: 0.5em;
+	}
 }
 
 .sample-note-flashcard-modal-content {
 	position: relative;
 	height: 100%;
 	width: 100%;
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
 }
 
 /* ============================

@@ -71,6 +71,12 @@
 
 		const tempTags = new Set<string>();
 		for (const notePath in plugin.notes) {
+			// Only include tags from files that have flashcards
+			const noteData = plugin.notes[notePath];
+			if (!noteData.cards || Object.keys(noteData.cards).length === 0) {
+				continue; // Skip files with no flashcards
+			}
+
 			const file = plugin.app.vault.getAbstractFileByPath(notePath);
 			if (file && file instanceof TFile) {
 				const fileCache = plugin.app.metadataCache.getFileCache(file);
@@ -165,6 +171,9 @@
 			return;
 		}
 
+		// Refresh tags to ensure they're in sync with current flashcards
+		uniqueTagsSet = collectUniqueTags();
+
 		let allCards = [];
 		for (const note of Object.values(plugin.notes)) {
 			allCards.push(...Object.values(note.cards));
@@ -182,6 +191,15 @@
 				});
 			} else {
 				filteredCards = [];
+			}
+
+			// Add tag filtering to note mode
+			if (tagFilter !== "all") {
+				filteredCards = filteredCards.filter((card) => {
+					const filePath = getFilePathForCard(card.cardUUID);
+					if (!filePath) return false;
+					return fileHasTag(filePath, tagFilter);
+				});
 			}
 
 			filteredCards = performSearchFiltering(filteredCards, searchText);
@@ -521,6 +539,7 @@
 	}
 
 	export function refreshView() {
+		uniqueTagsSet = collectUniqueTags();
 		renderUnifiedCards();
 	}
 </script>
@@ -534,7 +553,7 @@
 			<!-- Review Button Container -->
 			<div class="mb-2">
 				<button
-					class="w-full px-3 py-2 font-medium text-center text-white bg-indigo-600 rounded-md shadow-none dark:bg-indigo-500"
+					class="px-3 py-2 w-full font-medium text-center text-white bg-indigo-600 rounded-md shadow-none dark:bg-indigo-500"
 					on:click={launchReviewModal}
 				>
 					Review
@@ -575,7 +594,7 @@
 		{#if cardsToDisplay.length === 0}
 			<!-- Empty state -->
 			<div
-				class="flex flex-col items-center justify-center p-10 text-center"
+				class="flex flex-col justify-center items-center p-10 text-center"
 			>
 				<h3
 					class="mb-2 text-xl font-bold text-gray-800 dark:text-gray-200"
@@ -601,12 +620,12 @@
 		{#if cardsToDisplay.length > 0}
 			<div class="flex justify-center mt-6 mb-4">
 				<button
-					class="p-1.5 rounded-lg flex items-center justify-center text-white bg-red-500 dark:bg-red-600 shadow-none px-4 py-2"
+					class="flex justify-center items-center p-1.5 px-4 py-2 text-white bg-red-500 rounded-lg shadow-none dark:bg-red-600"
 					on:click={handleReset}
 				>
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
-						class="w-4 h-4 mr-1"
+						class="mr-1 w-4 h-4"
 						viewBox="0 0 24 24"
 						fill="none"
 						stroke="currentColor"
