@@ -157,20 +157,22 @@
 /* Ensure modal respects mobile viewport */
 @media (max-width: 768px) {
 	.sample-note-flashcard-modal {
-		max-width: calc(100vw - 2em);
-		max-height: calc(100vh - 4em);
-		margin: 1em;
+		--tablet-modal-margin: clamp(12px, 3vw, 24px);
+		max-width: calc(100vw - 2 * var(--tablet-modal-margin));
+		max-height: calc(100vh - 2 * var(--tablet-modal-margin));
+		margin: var(--tablet-modal-margin);
 	}
 }
 
 /* Small mobile devices */
 @media (max-width: 480px) {
 	.sample-note-flashcard-modal {
-		max-width: 100vw;
-		max-height: 100vh;
-		margin: 0;
-		border-radius: 0;
-		padding: 0.5em;
+		--mobile-modal-margin: clamp(12px, 4vw, 28px);
+		max-width: calc(100vw - 2 * var(--mobile-modal-margin));
+		max-height: calc(100vh - 2 * var(--mobile-modal-margin));
+		margin: var(--mobile-modal-margin);
+		border-radius: 0.75em;
+		padding: 0.75em;
 	}
 }
 
