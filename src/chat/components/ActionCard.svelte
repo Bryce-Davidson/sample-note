@@ -18,15 +18,15 @@
 </script>
 
 <div
-	class="p-3 border rounded-lg bg-white/5 dark:bg-black/5 border-white/10 dark:border-black/10"
+	class="p-3 rounded-lg border bg-white/5 dark:bg-black/5 border-white/10 dark:border-black/10"
 >
-	<div class="flex items-start justify-between">
-		<div class="flex items-start flex-1 space-x-3">
+	<div class="flex justify-between items-start">
+		<div class="flex flex-1 items-start space-x-3">
 			<!-- Status Icon -->
 			<div class="flex-shrink-0 mt-0.5">
 				{#if action.status === "pending"}
 					<div
-						class="w-4 h-4 border border-gray-400 rounded-full animate-pulse"
+						class="w-4 h-4 rounded-full border border-gray-400 animate-pulse"
 					></div>
 				{:else if action.status === "in-progress"}
 					<svg
@@ -63,7 +63,7 @@
 
 			<!-- Action Details -->
 			<div class="flex-1 min-w-0">
-				<div class="flex items-center justify-between">
+				<div class="flex justify-between items-center">
 					<h4
 						class="text-sm font-medium text-gray-900 dark:text-gray-100"
 					>
@@ -103,7 +103,7 @@
 									{action.params.noteName}
 								</div>
 								<div
-									class="overflow-y-auto text-gray-600 dark:text-gray-400 max-h-20"
+									class="overflow-y-auto max-h-20 text-gray-600 dark:text-gray-400"
 								>
 									{action.params.content.substring(
 										0,
@@ -118,7 +118,7 @@
 									{action.params.filePath}
 								</div>
 								<div
-									class="overflow-y-auto text-gray-600 dark:text-gray-400 max-h-20"
+									class="overflow-y-auto max-h-20 text-gray-600 dark:text-gray-400"
 								>
 									{action.params.content.substring(
 										0,
