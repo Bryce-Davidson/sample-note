@@ -157,21 +157,24 @@
 /* Ensure modal respects mobile viewport */
 @media (max-width: 768px) {
 	.sample-note-flashcard-modal {
-		--tablet-modal-margin: clamp(12px, 3vw, 24px);
-		max-width: calc(100vw - 2 * var(--tablet-modal-margin));
-		max-height: calc(100vh - 2 * var(--tablet-modal-margin));
-		margin: var(--tablet-modal-margin);
+		--tablet-modal-margin-x: clamp(12px, 3vw, 24px);
+		--tablet-modal-margin-y: clamp(16px, 6vh, 56px);
+		max-width: calc(100vw - 2 * var(--tablet-modal-margin-x));
+		max-height: calc(100vh - 2 * var(--tablet-modal-margin-y));
+		margin: var(--tablet-modal-margin-y) var(--tablet-modal-margin-x);
+		border-radius: 1em;
 	}
 }
 
 /* Small mobile devices */
 @media (max-width: 480px) {
 	.sample-note-flashcard-modal {
-		--mobile-modal-margin: clamp(12px, 4vw, 28px);
-		max-width: calc(100vw - 2 * var(--mobile-modal-margin));
-		max-height: calc(100vh - 2 * var(--mobile-modal-margin));
-		margin: var(--mobile-modal-margin);
-		border-radius: 0.75em;
+		--mobile-modal-margin-x: clamp(12px, 4vw, 28px);
+		--mobile-modal-margin-y: clamp(18px, 7vh, 64px);
+		max-width: calc(100vw - 2 * var(--mobile-modal-margin-x));
+		max-height: calc(100vh - 2 * var(--mobile-modal-margin-y));
+		margin: var(--mobile-modal-margin-y) var(--mobile-modal-margin-x);
+		border-radius: 1em;
 		padding: 0.75em;
 	}
 }
