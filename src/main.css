@@ -145,47 +145,55 @@
 /* ============================
    Flashcard Modal Styles
 =============================== */
+
+/* Modal wrapper - Applied to modalEl */
 .sample-note-flashcard-modal {
-	max-width: 95vw;
-	height: 100%;
+	/* Let Obsidian handle the modal positioning and sizing */
+	/* We just set reasonable constraints */
+	width: min(90vw, 800px);
+	max-width: 90vw;
+	height: min(85vh, 600px);
 	max-height: 85vh;
-	border-radius: 1.1em;
-	padding: 1em;
-	box-sizing: border-box;
 }
 
-/* Ensure modal respects mobile viewport */
-@media (max-width: 768px) {
-	.sample-note-flashcard-modal {
-		--tablet-modal-margin-x: clamp(12px, 3vw, 24px);
-		--tablet-modal-margin-y: clamp(16px, 6vh, 56px);
-		max-width: calc(100vw - 2 * var(--tablet-modal-margin-x));
-		max-height: calc(100vh - 2 * var(--tablet-modal-margin-y));
-		margin: var(--tablet-modal-margin-y) var(--tablet-modal-margin-x);
-		border-radius: 1em;
-	}
-}
-
-/* Small mobile devices */
-@media (max-width: 480px) {
-	.sample-note-flashcard-modal {
-		--mobile-modal-margin-x: clamp(12px, 4vw, 28px);
-		--mobile-modal-margin-y: clamp(18px, 7vh, 64px);
-		max-width: calc(100vw - 2 * var(--mobile-modal-margin-x));
-		max-height: calc(100vh - 2 * var(--mobile-modal-margin-y));
-		margin: var(--mobile-modal-margin-y) var(--mobile-modal-margin-x);
-		border-radius: 1em;
-		padding: 0.75em;
-	}
-}
-
+/* Content container - Applied to contentEl */
 .sample-note-flashcard-modal-content {
-	position: relative;
+	/* Use the full space provided by Obsidian's modal */
 	height: 100%;
 	width: 100%;
-	overflow: hidden;
 	display: flex;
 	flex-direction: column;
+	overflow: hidden;
+	/* Remove any default padding that might interfere */
+	padding: 0;
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 768px) {
+	.sample-note-flashcard-modal {
+		/* On tablets and smaller, use more of the viewport */
+		width: 95vw;
+		max-width: 95vw;
+		height: 90vh;
+		max-height: 90vh;
+	}
+}
+
+/* Very small screens (phones) */
+@media (max-width: 480px) {
+	.sample-note-flashcard-modal {
+		/* On phones, maximize space usage */
+		width: 100vw;
+		max-width: 100vw;
+		height: 100vh;
+		max-height: 100vh;
+		/* Obsidian will handle the safe areas */
+	}
+
+	/* Adjust internal padding for small screens */
+	.sample-note-flashcard-modal .modal-container {
+		padding: 0.5rem;
+	}
 }
 
 /* ============================

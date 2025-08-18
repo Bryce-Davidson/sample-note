@@ -215,24 +215,44 @@
 
 <style lang="postcss">
 	.modal-container {
-		@apply flex flex-col items-start h-full;
+		@apply flex flex-col h-full w-full p-4;
+		/* Ensure the container fills the modal content area */
+		box-sizing: border-box;
 	}
 
 	.top-bar {
-		@apply w-full flex flex-col items-center justify-center;
+		@apply w-full flex flex-col items-center justify-center mb-4 flex-shrink-0;
 	}
 
 	.main-content {
-		@apply flex-1 min-h-0 px-4 py-4 overflow-y-auto w-full;
-		min-height: 300px; /* Prevent layout collapse */
-		position: relative; /* For better content positioning */
+		@apply flex-1 min-h-0 overflow-y-auto w-full;
+		/* Remove horizontal padding as it's handled by modal-container */
+		/* Keep vertical padding for content spacing */
+		padding-top: 0.5rem;
+		padding-bottom: 0.5rem;
 	}
 
 	.no-cards {
-		@apply text-gray-500;
+		@apply text-gray-500 text-center p-8;
 	}
 
 	.bottom-tray {
-		@apply w-full px-4 py-4 border-t border-gray-200 dark:border-gray-800 flex-shrink-0;
+		@apply w-full pt-4 border-t border-gray-200 dark:border-gray-800 flex-shrink-0;
+		/* Remove horizontal padding as it's handled by modal-container */
+	}
+
+	/* Responsive padding adjustments */
+	@media (max-width: 480px) {
+		.modal-container {
+			@apply p-2;
+		}
+
+		.top-bar {
+			@apply mb-2;
+		}
+
+		.bottom-tray {
+			@apply pt-2;
+		}
 	}
 </style>

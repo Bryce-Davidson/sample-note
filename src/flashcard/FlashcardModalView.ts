@@ -42,9 +42,11 @@ export class SvelteFlashcardModal extends Modal {
 		const { contentEl, modalEl } = this;
 		contentEl.empty();
 
+		// Apply classes to style the modal wrapper and content
 		modalEl.addClass("sample-note-flashcard-modal");
 		contentEl.addClass("sample-note-flashcard-modal-content");
 
+		// Create the Svelte component
 		this.component = new FlashcardModal({
 			target: contentEl,
 			props: {
@@ -58,6 +60,7 @@ export class SvelteFlashcardModal extends Modal {
 
 		this.setupComponentEventListeners();
 
+		// Blur any focused element to prevent keyboard conflicts
 		setTimeout(() => {
 			if (document.activeElement instanceof HTMLElement) {
 				document.activeElement.blur();
