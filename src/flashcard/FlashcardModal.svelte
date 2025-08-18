@@ -182,7 +182,7 @@
 	});
 </script>
 
-<div class="modal-container" bind:this={modalContainer}>
+<div class="modal-inner" bind:this={modalContainer}>
 	<div class="top-bar">
 		<ProgressBar {currentIndex} {totalCardCount} />
 		<CardNavigation
@@ -214,7 +214,7 @@
 </div>
 
 <style lang="postcss">
-	.modal-container {
+	.modal-inner {
 		@apply flex flex-col h-full w-full;
 		padding: 1rem 0.75rem;
 		box-sizing: border-box;
@@ -236,23 +236,5 @@
 
 	.bottom-tray {
 		@apply w-full pt-4 border-t border-gray-200 dark:border-gray-800 flex-shrink-0;
-	}
-
-	@media (max-width: 480px) {
-		.modal-container {
-			padding: 0.75rem 0.5rem;
-		}
-
-		.main-content {
-			padding: 0.25rem 0.75rem;
-		}
-
-		.top-bar {
-			margin-bottom: 0.5rem;
-		}
-
-		.bottom-tray {
-			padding-top: 0.5rem;
-		}
 	}
 </style>
