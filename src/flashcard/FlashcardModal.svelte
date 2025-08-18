@@ -216,7 +216,6 @@
 <style lang="postcss">
 	.modal-container {
 		@apply flex flex-col h-full w-full;
-		/* Add padding with consideration for scrollbars */
 		padding: 1rem 0.75rem;
 		box-sizing: border-box;
 	}
@@ -227,9 +226,7 @@
 
 	.main-content {
 		@apply flex-1 min-h-0 overflow-y-auto w-full;
-		/* Add padding to prevent content from hiding behind scrollbars */
 		padding: 0.5rem 1rem;
-		/* Ensure content doesn't touch scrollbar */
 		box-sizing: border-box;
 	}
 
@@ -239,10 +236,8 @@
 
 	.bottom-tray {
 		@apply w-full pt-4 border-t border-gray-200 dark:border-gray-800 flex-shrink-0;
-		/* Remove horizontal padding as it's handled by modal-container */
 	}
 
-	/* Mobile adjustments - align with main.css breakpoint */
 	@media (max-width: 480px) {
 		.modal-container {
 			padding: 0.75rem 0.5rem;

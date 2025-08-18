@@ -146,39 +146,18 @@
    Flashcard Modal Styles
 =============================== */
 
-/* Modal wrapper - Applied to modalEl */
 .sample-note-flashcard-modal {
 	width: min(90vw, 800px);
 	height: min(85vh, 600px);
-	border-radius: 12px;
-	overflow: hidden;
-	margin: auto;
 }
 
-/* Content container - Applied to contentEl */
 .sample-note-flashcard-modal-content {
 	height: 100%;
 	width: 100%;
-	display: flex;
-	flex-direction: column;
-	overflow: hidden;
-	padding: 0;
 }
 
-/* Tablet and mobile responsive adjustments */
-@media (max-width: 768px) {
-	.sample-note-flashcard-modal {
-		width: calc(100vw - 2rem);
-		height: calc(100vh - 3rem);
-		margin: 1.5rem 1rem;
-		border-radius: 16px;
-	}
-}
-
-/* Mobile phones with optional safe area support */
 @media (max-width: 480px) {
 	.sample-note-flashcard-modal {
-		/* Use CSS max() to handle both regular spacing and safe areas in one rule */
 		width: calc(
 			100vw -
 				max(
@@ -196,9 +175,6 @@
 				)
 		);
 		margin: max(1.25rem, env(safe-area-inset-top, 0px) + 1.25rem) 0.75rem;
-		border-radius: 20px;
-		/* Add subtle shadow for depth */
-		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
 	}
 }
 
