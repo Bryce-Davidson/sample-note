@@ -215,8 +215,9 @@
 
 <style lang="postcss">
 	.modal-container {
-		@apply flex flex-col h-full w-full p-4;
-		/* Ensure the container fills the modal content area */
+		@apply flex flex-col h-full w-full;
+		/* Add padding with consideration for scrollbars */
+		padding: 1rem 0.75rem;
 		box-sizing: border-box;
 	}
 
@@ -226,10 +227,10 @@
 
 	.main-content {
 		@apply flex-1 min-h-0 overflow-y-auto w-full;
-		/* Remove horizontal padding as it's handled by modal-container */
-		/* Keep vertical padding for content spacing */
-		padding-top: 0.5rem;
-		padding-bottom: 0.5rem;
+		/* Add padding to prevent content from hiding behind scrollbars */
+		padding: 0.5rem 1rem;
+		/* Ensure content doesn't touch scrollbar */
+		box-sizing: border-box;
 	}
 
 	.no-cards {
@@ -244,7 +245,12 @@
 	/* Responsive padding adjustments */
 	@media (max-width: 480px) {
 		.modal-container {
-			@apply p-2;
+			padding: 0.75rem 0.5rem;
+		}
+
+		.main-content {
+			/* Reduce padding on small screens but keep scrollbar clearance */
+			padding: 0.25rem 0.75rem;
 		}
 
 		.top-bar {
