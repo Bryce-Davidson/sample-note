@@ -242,23 +242,22 @@
 		/* Remove horizontal padding as it's handled by modal-container */
 	}
 
-	/* Responsive padding adjustments */
+	/* Mobile adjustments - align with main.css breakpoint */
 	@media (max-width: 480px) {
 		.modal-container {
 			padding: 0.75rem 0.5rem;
 		}
 
 		.main-content {
-			/* Reduce padding on small screens but keep scrollbar clearance */
 			padding: 0.25rem 0.75rem;
 		}
 
 		.top-bar {
-			@apply mb-2;
+			margin-bottom: 0.5rem;
 		}
 
 		.bottom-tray {
-			@apply pt-2;
+			padding-top: 0.5rem;
 		}
 	}
 </style>

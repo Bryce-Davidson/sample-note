@@ -149,78 +149,56 @@
 /* Modal wrapper - Applied to modalEl */
 .sample-note-flashcard-modal {
 	width: min(90vw, 800px);
-	max-width: 90vw;
 	height: min(85vh, 600px);
-	max-height: 85vh;
 	border-radius: 12px;
 	overflow: hidden;
+	margin: auto;
 }
 
 /* Content container - Applied to contentEl */
 .sample-note-flashcard-modal-content {
-	/* Use the full space provided by Obsidian's modal */
 	height: 100%;
 	width: 100%;
 	display: flex;
 	flex-direction: column;
 	overflow: hidden;
-	/* Remove any default padding that might interfere */
 	padding: 0;
 }
 
-/* Responsive adjustments for smaller screens */
+/* Tablet and mobile responsive adjustments */
 @media (max-width: 768px) {
 	.sample-note-flashcard-modal {
-		/* On tablets, provide some breathing room */
-		width: calc(100vw - 32px);
-		max-width: calc(100vw - 32px);
-		height: calc(100vh - 48px);
-		max-height: calc(100vh - 48px);
-		margin: 24px 16px;
+		width: calc(100vw - 2rem);
+		height: calc(100vh - 3rem);
+		margin: 1.5rem 1rem;
 		border-radius: 16px;
 	}
 }
 
-/* Very small screens (phones) */
+/* Mobile phones with optional safe area support */
 @media (max-width: 480px) {
 	.sample-note-flashcard-modal {
-		width: calc(100vw - 24px);
-		max-width: calc(100vw - 24px);
-		height: calc(100vh - 40px);
-		max-height: calc(100vh - 40px);
-		margin: 20px 12px;
+		/* Use CSS max() to handle both regular spacing and safe areas in one rule */
+		width: calc(
+			100vw -
+				max(
+					1.5rem,
+					env(safe-area-inset-left, 0px) +
+						env(safe-area-inset-right, 0px) + 1.5rem
+				)
+		);
+		height: calc(
+			100vh -
+				max(
+					2.5rem,
+					env(safe-area-inset-top, 0px) +
+						env(safe-area-inset-bottom, 0px) + 2.5rem
+				)
+		);
+		margin: max(1.25rem, env(safe-area-inset-top, 0px) + 1.25rem) 0.75rem;
 		border-radius: 20px;
-	}
-
-	/* Add subtle shadow for better visual depth on mobile */
-	.sample-note-flashcard-modal {
-		box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-	}
-}
-
-/* Ensure safe area insets are respected on devices with notches/home indicators */
-@supports (padding: max(0px)) {
-	@media (max-width: 480px) {
-		.sample-note-flashcard-modal {
-			/* Account for safe areas on modern phones */
-			width: calc(
-				100vw -
-					max(
-						24px,
-						env(safe-area-inset-left) + env(safe-area-inset-right) +
-							24px
-					)
-			);
-			height: calc(
-				100vh -
-					max(
-						40px,
-						env(safe-area-inset-top) + env(safe-area-inset-bottom) +
-							40px
-					)
-			);
-			margin: max(20px, env(safe-area-inset-top) + 20px) 12px;
-		}
+		/* Add subtle shadow for depth */
+		box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
 	}
 }
 
