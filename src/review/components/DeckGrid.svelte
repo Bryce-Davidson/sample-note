@@ -66,7 +66,10 @@
 	}
 </script>
 
-<div class="grid grid-cols-2 gap-4 p-4 md:grid-cols-3 lg:grid-cols-4">
+<div
+	class="grid gap-4 p-4 deck-grid"
+	style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr))"
+>
 	{#each decks as deck}
 		<button
 			class="flex flex-col justify-center items-center p-6 text-center bg-white rounded-lg border border-gray-200 shadow-md dark:bg-gray-800 dark:border-gray-700"
@@ -100,3 +103,11 @@
 		</p>
 	</div>
 {/if}
+
+<style>
+	@media (max-width: 767px) {
+		:global(.deck-grid) {
+			grid-template-columns: 1fr 1fr !important;
+		}
+	}
+</style>
