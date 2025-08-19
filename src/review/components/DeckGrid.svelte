@@ -69,7 +69,7 @@
 <div class="grid grid-cols-2 gap-4 p-4 md:grid-cols-3 lg:grid-cols-4">
 	{#each decks as deck}
 		<button
-			class="flex flex-col justify-center items-center p-6 text-center bg-white rounded-lg border border-gray-200 shadow-md transition-all hover:shadow-lg hover:scale-105 dark:bg-gray-800 dark:hover:bg-gray-700 dark:border-gray-700"
+			class="flex flex-col justify-center items-center p-6 text-center bg-white rounded-lg border border-gray-200 shadow-md dark:bg-gray-800 dark:border-gray-700"
 			on:click={() => onDeckClick(deck)}
 		>
 			<div class="mb-2 text-3xl">
