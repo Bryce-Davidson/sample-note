@@ -571,6 +571,11 @@
 	async function handleDeckClick(tag: string) {
 		tagFilter = tag;
 		viewMode = "cards"; // Switch back to cards view
+
+		// Record deck usage for ordering
+		plugin.deckUsage[tag] = new Date().toISOString();
+		await plugin.savePluginData();
+
 		renderUnifiedCards();
 		// Auto-launch review modal after a brief delay to show the filtered cards
 		setTimeout(() => {
@@ -772,6 +777,7 @@
 			{uniqueTagsSet}
 			onDeckClick={handleDeckClick}
 			{getCardCountForTag}
+			deckUsage={plugin.deckUsage}
 		/>
 	{/if}
 </div>

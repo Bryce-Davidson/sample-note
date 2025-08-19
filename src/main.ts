@@ -59,6 +59,7 @@ const DEFAULT_SETTINGS: SampleNoteSettings = {
 export interface PluginData {
 	settings: SampleNoteSettings;
 	notes: PluginNotes;
+	deckUsage?: Record<string, string>; // tag -> last review timestamp
 }
 
 class SampleNoteSettingTab extends PluginSettingTab {
@@ -128,6 +129,7 @@ class SampleNoteSettingTab extends PluginSettingTab {
 export default class SampleNotePlugin extends Plugin {
 	settings: SampleNoteSettings;
 	notes: PluginNotes = {};
+	deckUsage: Record<string, string> = {}; // tag -> last review timestamp
 	protected refreshTimeout: number | null = null;
 	protected toggleHiddenRibbonEl: HTMLElement | null = null;
 	public occlusionManager: OcclusionManager;
@@ -188,9 +190,11 @@ export default class SampleNotePlugin extends Plugin {
 		if (data) {
 			this.settings = data.settings || DEFAULT_SETTINGS;
 			this.notes = data.notes || {};
+			this.deckUsage = data.deckUsage || {};
 		} else {
 			this.settings = DEFAULT_SETTINGS;
 			this.notes = {};
+			this.deckUsage = {};
 		}
 		document.documentElement.style.setProperty(
 			"--hidden-color",
@@ -202,6 +206,7 @@ export default class SampleNotePlugin extends Plugin {
 		const data: PluginData = {
 			settings: this.settings,
 			notes: this.notes,
+			deckUsage: this.deckUsage,
 		};
 		await this.saveData(data);
 	}
