@@ -39,9 +39,8 @@
 
 	let modalContainer: HTMLElement;
 
-	// Debouncing for expensive operations
-	let saveTimeout: NodeJS.Timeout | null = null;
-	let pendingUpdates: Array<{ cardUUID: string; cardState: CardState }> = [];
+	// Simple async operation tracking for cleanup
+	let pendingOperations: Promise<void>[] = [];
 
 	function showTopNotice(message: string, timeout: number = 4000): Notice {
 		const notice = new Notice(message, timeout);
@@ -57,36 +56,26 @@
 		return notice;
 	}
 
-	// Debounced save function to batch multiple updates
-	function debouncedSave() {
-		if (saveTimeout) {
-			clearTimeout(saveTimeout);
-		}
-
-		saveTimeout = setTimeout(async () => {
-			if (pendingUpdates.length > 0) {
-				try {
-					await plugin.savePluginData();
-					plugin.flashcardManager.refreshUnifiedQueue();
-
-					// Dispatch events for all pending updates
-					pendingUpdates.forEach(({ cardUUID, cardState }) => {
-						flashcardEventStore.dispatchCardReviewed(
-							cardUUID,
-							cardState,
-						);
-					});
-
-					pendingUpdates = [];
-				} catch (error) {
-					console.error("Error saving card data:", error);
-					showTopNotice(
-						"Error saving progress, but review continues.",
-					);
-				}
+	// Simple fire-and-forget async operation
+	function queueAsyncOperation(cardUUID: string, cardState: CardState) {
+		const operation = (async () => {
+			try {
+				await plugin.savePluginData();
+				plugin.flashcardManager.refreshUnifiedQueue();
+				flashcardEventStore.dispatchCardReviewed(cardUUID, cardState);
+			} catch (error) {
+				console.error("Error saving card data:", error);
+				showTopNotice("Error saving progress, but review continues.");
 			}
-			saveTimeout = null;
-		}, 100); // 100ms debounce delay
+		})();
+
+		// Track for cleanup, but don't wait
+		pendingOperations.push(operation);
+
+		// Clean up completed operations periodically to prevent memory leaks
+		if (pendingOperations.length > 10) {
+			pendingOperations = pendingOperations.slice(-5); // Keep only the last 5 operations
+		}
 	}
 
 	async function handleRating(rating: number) {
@@ -103,14 +92,11 @@
 		const updated = updateCardState(card, rating, now, false);
 		plugin.notes[filePath].cards[card.cardUUID] = updated;
 
-		// Add to pending updates for batched processing
-		pendingUpdates.push({ cardUUID: card.cardUUID, cardState: updated });
-
 		// Move to next card immediately for fast transition
 		moveToNextCardOrClose();
 
-		// Schedule debounced save
-		debouncedSave();
+		// Queue async operations (fire-and-forget)
+		queueAsyncOperation(card.cardUUID, updated);
 	}
 
 	async function handleStop() {
@@ -129,14 +115,11 @@
 
 		showTopNotice("Scheduling stopped for this card.");
 
-		// Add to pending updates for batched processing
-		pendingUpdates.push({ cardUUID: card.cardUUID, cardState: updated });
-
 		// Move to next card immediately for fast transition
 		moveToNextCardOrClose();
 
-		// Schedule debounced save
-		debouncedSave();
+		// Queue async operations (fire-and-forget)
+		queueAsyncOperation(card.cardUUID, updated);
 	}
 
 	function navigateToCard() {
@@ -223,20 +206,11 @@
 	onDestroy(() => {
 		document.removeEventListener("keydown", handleKeydown);
 
-		// Clean up any pending saves
-		if (saveTimeout) {
-			clearTimeout(saveTimeout);
-			// Force save any pending updates before destroying
-			if (pendingUpdates.length > 0) {
-				plugin
-					.savePluginData()
-					.catch((error) =>
-						console.error(
-							"Error saving pending updates on destroy:",
-							error,
-						),
-					);
-			}
+		// Wait for any pending async operations to complete
+		if (pendingOperations.length > 0) {
+			Promise.allSettled(pendingOperations).catch((error) =>
+				console.error("Error waiting for pending operations:", error),
+			);
 		}
 	});
 </script>

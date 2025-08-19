@@ -27,7 +27,6 @@
 	} | null = null;
 	let currentComponent: any = null;
 	let isRendering: boolean = false;
-	let lastRenderedUUID: string | null = null;
 
 	$: cardStateAndFile = flashcard
 		? findCardStateAndFile(plugin, flashcard.uuid)
@@ -88,13 +87,7 @@
 			return;
 		}
 
-		// Skip rendering if this card is already rendered
-		if (flashcard.uuid === lastRenderedUUID && !error) {
-			return;
-		}
-
 		isRendering = true;
-		lastRenderedUUID = flashcard.uuid;
 
 		const tempContainer = document.createElement("div");
 		tempContainer.setAttribute("data-flashcard-content", "true");
@@ -144,69 +137,39 @@
 					contentWrapper.appendChild(tempContainer);
 				}
 			} else {
-				// Use requestAnimationFrame to ensure smooth transitions
-				requestAnimationFrame(async () => {
-					try {
-						await MarkdownRenderer.render(
-							plugin.app,
-							flashcard.content,
-							tempContainer,
-							flashcard.filePath ?? "",
-							plugin,
-						);
+				await MarkdownRenderer.render(
+					plugin.app,
+					flashcard.content,
+					tempContainer,
+					flashcard.filePath ?? "",
+					plugin,
+				);
 
-						// Process all hidden text first to create the hide elements
-						processCustomHiddenText(tempContainer, false);
+				// Process all hidden text first to create the hide elements
+				processCustomHiddenText(tempContainer, false);
 
-						// Then apply hide group visibility if this is a hide group card
-						if (cardStateAndFile?.card.hideGroupId) {
-							processHideGroups(
-								tempContainer,
-								cardStateAndFile.card.hideGroupId,
-							);
-						}
+				// Then apply hide group visibility if this is a hide group card
+				if (cardStateAndFile?.card.hideGroupId) {
+					processHideGroups(
+						tempContainer,
+						cardStateAndFile.card.hideGroupId,
+					);
+				}
 
-						tempContainer
-							.querySelectorAll("a.internal-link")
-							.forEach((link) =>
-								link.addEventListener(
-									"click",
-									handleInternalLink,
-								),
-							);
+				tempContainer
+					.querySelectorAll("a.internal-link")
+					.forEach((link) =>
+						link.addEventListener("click", handleInternalLink),
+					);
 
-						error = null;
+				error = null;
 
-						// Use requestAnimationFrame for DOM updates to ensure smooth rendering
-						requestAnimationFrame(() => {
-							if (
-								contentWrapper &&
-								tempContainer.parentElement === null
-							) {
-								while (contentWrapper.firstChild) {
-									contentWrapper.removeChild(
-										contentWrapper.firstChild,
-									);
-								}
-								tempContainer.removeClass(
-									"sample-note-flashcard-temp-hidden",
-								);
-								tempContainer.addClass(
-									"sample-note-flashcard-temp-visible",
-								);
-								contentWrapper.appendChild(tempContainer);
-							}
-						});
-					} catch (innerError) {
-						error = {
-							message: `Error rendering flashcard: ${innerError.message || "Unknown error"}`,
-							filePath: flashcard.filePath,
-							line: flashcard.line,
-							cardTitle: flashcard.cardTitle,
-						};
-						tempContainer.remove();
-					}
-				});
+				while (contentWrapper.firstChild) {
+					contentWrapper.removeChild(contentWrapper.firstChild);
+				}
+				tempContainer.removeClass("sample-note-flashcard-temp-hidden");
+				tempContainer.addClass("sample-note-flashcard-temp-visible");
+				contentWrapper.appendChild(tempContainer);
 			}
 		} catch (renderError) {
 			error = {
