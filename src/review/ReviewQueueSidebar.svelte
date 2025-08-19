@@ -15,12 +15,14 @@
 	import FilterButtons from "./components/FilterButtons.svelte";
 	import Card from "./components/Card.svelte";
 	import FilterRow from "./components/FilterRow.svelte";
+	import DeckGrid from "./components/DeckGrid.svelte";
 
 	export let plugin: SampleNotePlugin;
 
 	let filterMode = "due";
 	let searchText = "";
 	let tagFilter = "all";
+	let viewMode: "cards" | "decks" = "cards"; // New state for view mode
 
 	function getEmptyStateTitle() {
 		return "You're all caught up!";
@@ -564,90 +566,91 @@
 		uniqueTagsSet = collectUniqueTags();
 		renderUnifiedCards();
 	}
+
+	// Handle deck click - set tag filter and launch review
+	async function handleDeckClick(tag: string) {
+		tagFilter = tag;
+		viewMode = "cards"; // Switch back to cards view
+		renderUnifiedCards();
+		// Auto-launch review modal after a brief delay to show the filtered cards
+		setTimeout(() => {
+			launchReviewModal();
+		}, 100);
+	}
 </script>
 
 <div>
-	<!-- Persistent filter header -->
-	<div
-		class="top-0 z-10 p-4 mb-6 bg-white rounded-lg shadow-md dark:bg-gray-800"
-	>
-		<div class="space-y-4">
-			<!-- Review Button Container -->
-			<div class="mb-2">
-				<button
-					class="px-3 py-2 w-full font-medium text-center text-white bg-indigo-600 rounded-md shadow-none dark:bg-indigo-500"
-					on:click={launchReviewModal}
-				>
-					Review
-				</button>
+	{#if viewMode === "cards"}
+		<!-- Persistent filter header for cards view -->
+		<div
+			class="top-0 z-10 p-4 mb-6 bg-white rounded-lg shadow-md dark:bg-gray-800"
+		>
+			<div class="space-y-4">
+				<!-- Top button row -->
+				<div class="flex gap-2">
+					<!-- Review Button -->
+					<button
+						class="flex-1 px-3 py-2 font-medium text-center text-white bg-indigo-600 rounded-md shadow-none dark:bg-indigo-500"
+						on:click={launchReviewModal}
+					>
+						Review
+					</button>
+					<!-- Decks Button -->
+					<button
+						class="px-3 py-2 font-medium text-center text-indigo-600 bg-white rounded-md border border-indigo-600 shadow-none dark:text-indigo-400 dark:bg-gray-800 dark:border-indigo-400 hover:bg-indigo-50 dark:hover:bg-gray-700"
+						on:click={() => (viewMode = "decks")}
+					>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							class="inline-block mr-1 w-4 h-4"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+						>
+							<rect x="3" y="3" width="7" height="7"></rect>
+							<rect x="14" y="3" width="7" height="7"></rect>
+							<rect x="14" y="14" width="7" height="7"></rect>
+							<rect x="3" y="14" width="7" height="7"></rect>
+						</svg>
+						Decks
+					</button>
+				</div>
+
+				<!-- Mode Button Container -->
+				<FilterButtons
+					bind:filterMode
+					onFilterChange={(mode) => {
+						filterMode = mode;
+						renderUnifiedCards();
+					}}
+				/>
+
+				<!-- Filter Row -->
+				<FilterRow
+					bind:tagFilter
+					bind:searchText
+					{uniqueTagsSet}
+					onFilterChange={renderUnifiedCards}
+				/>
 			</div>
-
-			<!-- Mode Button Container -->
-			<FilterButtons
-				bind:filterMode
-				onFilterChange={(mode) => {
-					filterMode = mode;
-					renderUnifiedCards();
-				}}
-			/>
-
-			<!-- Filter Row -->
-			<FilterRow
-				bind:tagFilter
-				bind:searchText
-				{uniqueTagsSet}
-				onFilterChange={renderUnifiedCards}
-			/>
 		</div>
-	</div>
-
-	<!-- Card Container -->
-	<div class="flex flex-col gap-4 mt-4">
-		<div class="flex justify-center">
-			<div
-				class="text-sm font-medium text-center text-indigo-600 dark:text-indigo-400"
-			>
-				{cardsToDisplay.length} flashcard{cardsToDisplay.length === 1
-					? ""
-					: "s"}
-			</div>
-		</div>
-
-		{#if cardsToDisplay.length === 0}
-			<!-- Empty state -->
-			<div
-				class="flex flex-col justify-center items-center p-10 text-center"
-			>
-				<h3
-					class="mb-2 text-xl font-bold text-gray-800 dark:text-gray-200"
-				>
-					{getEmptyStateTitle()}
-				</h3>
-				<p class="text-gray-600 dark:text-gray-400">
-					{getEmptyStateMessage()}
-				</p>
-			</div>
-		{:else}
-			{#each cardsToDisplay as cardState (cardState.cardUUID)}
-				{@const filePath = getFilePathForCard(cardState.cardUUID) || ""}
-				{@const file = plugin.app.vault.getAbstractFileByPath(filePath)}
-				{@const now = new Date()}
-				{@const cardMeta = getCardMetaInfo(cardState, now)}
-				{#if file && file instanceof TFile}
-					<Card {plugin} {cardState} {filePath} {file} {cardMeta} />
-				{/if}
-			{/each}
-		{/if}
-
-		{#if cardsToDisplay.length > 0}
-			<div class="flex justify-center mt-6 mb-4">
+	{:else}
+		<!-- Decks view header -->
+		<div
+			class="top-0 z-10 p-4 mb-6 bg-white rounded-lg shadow-md dark:bg-gray-800"
+		>
+			<div class="flex justify-between items-center">
+				<!-- Back button -->
 				<button
-					class="flex justify-center items-center p-1.5 px-4 py-2 text-white bg-red-500 rounded-lg shadow-none dark:bg-red-600"
-					on:click={handleReset}
+					class="flex items-center px-3 py-2 text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
+					on:click={() => (viewMode = "cards")}
 				>
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
-						class="mr-1 w-4 h-4"
+						class="mr-2 w-5 h-5"
 						viewBox="0 0 24 24"
 						fill="none"
 						stroke="currentColor"
@@ -655,12 +658,97 @@
 						stroke-linecap="round"
 						stroke-linejoin="round"
 					>
-						<path d="M3 2v6h6"></path>
-						<path d="M3 13a9 9 0 1 0 3-7.7L3 8"></path>
+						<line x1="19" y1="12" x2="5" y2="12"></line>
+						<polyline points="12 19 5 12 12 5"></polyline>
 					</svg>
-					Reset Filtered Cards
+					Back
 				</button>
+				<!-- Title -->
+				<h2
+					class="text-lg font-semibold text-gray-800 dark:text-gray-200"
+				>
+					Select a Deck
+				</h2>
+				<div class="w-20"></div>
+				<!-- Spacer for centering -->
 			</div>
-		{/if}
-	</div>
+		</div>
+	{/if}
+
+	{#if viewMode === "cards"}
+		<!-- Card Container -->
+		<div class="flex flex-col gap-4 mt-4">
+			<div class="flex justify-center">
+				<div
+					class="text-sm font-medium text-center text-indigo-600 dark:text-indigo-400"
+				>
+					{cardsToDisplay.length} flashcard{cardsToDisplay.length ===
+					1
+						? ""
+						: "s"}
+				</div>
+			</div>
+
+			{#if cardsToDisplay.length === 0}
+				<!-- Empty state -->
+				<div
+					class="flex flex-col justify-center items-center p-10 text-center"
+				>
+					<h3
+						class="mb-2 text-xl font-bold text-gray-800 dark:text-gray-200"
+					>
+						{getEmptyStateTitle()}
+					</h3>
+					<p class="text-gray-600 dark:text-gray-400">
+						{getEmptyStateMessage()}
+					</p>
+				</div>
+			{:else}
+				{#each cardsToDisplay as cardState (cardState.cardUUID)}
+					{@const filePath =
+						getFilePathForCard(cardState.cardUUID) || ""}
+					{@const file =
+						plugin.app.vault.getAbstractFileByPath(filePath)}
+					{@const now = new Date()}
+					{@const cardMeta = getCardMetaInfo(cardState, now)}
+					{#if file && file instanceof TFile}
+						<Card
+							{plugin}
+							{cardState}
+							{filePath}
+							{file}
+							{cardMeta}
+						/>
+					{/if}
+				{/each}
+			{/if}
+
+			{#if cardsToDisplay.length > 0}
+				<div class="flex justify-center mt-6 mb-4">
+					<button
+						class="flex justify-center items-center p-1.5 px-4 py-2 text-white bg-red-500 rounded-lg shadow-none dark:bg-red-600"
+						on:click={handleReset}
+					>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							class="mr-1 w-4 h-4"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+						>
+							<path d="M3 2v6h6"></path>
+							<path d="M3 13a9 9 0 1 0 3-7.7L3 8"></path>
+						</svg>
+						Reset Filtered Cards
+					</button>
+				</div>
+			{/if}
+		</div>
+	{:else}
+		<!-- Deck Grid View -->
+		<DeckGrid {uniqueTagsSet} onDeckClick={handleDeckClick} />
+	{/if}
 </div>
