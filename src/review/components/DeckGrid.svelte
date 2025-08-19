@@ -1,6 +1,7 @@
 <script lang="ts">
 	export let uniqueTagsSet: Set<string>;
 	export let onDeckClick: (tag: string) => void;
+	export let getCardCountForTag: (tag: string) => number;
 
 	// Convert set to array and add "all" option at the beginning
 	$: decks = ["all", ...Array.from(uniqueTagsSet)];
@@ -16,6 +17,10 @@
 		if (tag === "all") return "All Cards";
 		return tag;
 	}
+
+	function getCardCount(tag: string) {
+		return getCardCountForTag(tag);
+	}
 </script>
 
 <div class="grid grid-cols-2 gap-4 p-4 md:grid-cols-3 lg:grid-cols-4">
@@ -29,6 +34,9 @@
 			</div>
 			<div class="text-sm font-medium text-gray-800 dark:text-gray-200">
 				{getDeckLabel(deck)}
+			</div>
+			<div class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+				{getCardCount(deck)} card{getCardCount(deck) === 1 ? "" : "s"}
 			</div>
 		</button>
 	{/each}

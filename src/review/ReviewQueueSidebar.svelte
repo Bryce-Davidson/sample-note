@@ -577,6 +577,25 @@
 			launchReviewModal();
 		}, 100);
 	}
+
+	// Get card count for a specific tag
+	function getCardCountForTag(tag: string): number {
+		if (!plugin || !plugin.notes) return 0;
+
+		let count = 0;
+		for (const filePath in plugin.notes) {
+			const noteData = plugin.notes[filePath];
+			if (!noteData.cards || Object.keys(noteData.cards).length === 0) {
+				continue;
+			}
+
+			// Check if file has the specified tag (or if tag is "all")
+			if (tag === "all" || fileHasTag(filePath, tag)) {
+				count += Object.keys(noteData.cards).length;
+			}
+		}
+		return count;
+	}
 </script>
 
 <div>
@@ -749,6 +768,10 @@
 		</div>
 	{:else}
 		<!-- Deck Grid View -->
-		<DeckGrid {uniqueTagsSet} onDeckClick={handleDeckClick} />
+		<DeckGrid
+			{uniqueTagsSet}
+			onDeckClick={handleDeckClick}
+			{getCardCountForTag}
+		/>
 	{/if}
 </div>
