@@ -39,6 +39,10 @@
 
 	let modalContainer: HTMLElement;
 
+	// Debouncing for expensive operations
+	let saveTimeout: NodeJS.Timeout | null = null;
+	let pendingUpdates: Array<{ cardUUID: string; cardState: CardState }> = [];
+
 	function showTopNotice(message: string, timeout: number = 4000): Notice {
 		const notice = new Notice(message, timeout);
 		const noticeElements = document.querySelectorAll(".notice");
@@ -51,6 +55,38 @@
 			}
 		}
 		return notice;
+	}
+
+	// Debounced save function to batch multiple updates
+	function debouncedSave() {
+		if (saveTimeout) {
+			clearTimeout(saveTimeout);
+		}
+
+		saveTimeout = setTimeout(async () => {
+			if (pendingUpdates.length > 0) {
+				try {
+					await plugin.savePluginData();
+					plugin.flashcardManager.refreshUnifiedQueue();
+
+					// Dispatch events for all pending updates
+					pendingUpdates.forEach(({ cardUUID, cardState }) => {
+						flashcardEventStore.dispatchCardReviewed(
+							cardUUID,
+							cardState,
+						);
+					});
+
+					pendingUpdates = [];
+				} catch (error) {
+					console.error("Error saving card data:", error);
+					showTopNotice(
+						"Error saving progress, but review continues.",
+					);
+				}
+			}
+			saveTimeout = null;
+		}, 100); // 100ms debounce delay
 	}
 
 	async function handleRating(rating: number) {
@@ -66,12 +102,15 @@
 		const { filePath, card } = found;
 		const updated = updateCardState(card, rating, now, false);
 		plugin.notes[filePath].cards[card.cardUUID] = updated;
-		await plugin.savePluginData();
-		plugin.flashcardManager.refreshUnifiedQueue();
 
-		flashcardEventStore.dispatchCardReviewed(card.cardUUID, updated);
+		// Add to pending updates for batched processing
+		pendingUpdates.push({ cardUUID: card.cardUUID, cardState: updated });
 
+		// Move to next card immediately for fast transition
 		moveToNextCardOrClose();
+
+		// Schedule debounced save
+		debouncedSave();
 	}
 
 	async function handleStop() {
@@ -87,13 +126,17 @@
 		const now = new Date();
 		const updated = updateCardState(card, 0, now, true);
 		plugin.notes[filePath].cards[card.cardUUID] = updated;
-		await plugin.savePluginData();
+
 		showTopNotice("Scheduling stopped for this card.");
-		plugin.flashcardManager.refreshUnifiedQueue();
 
-		flashcardEventStore.dispatchCardReviewed(card.cardUUID, updated);
+		// Add to pending updates for batched processing
+		pendingUpdates.push({ cardUUID: card.cardUUID, cardState: updated });
 
+		// Move to next card immediately for fast transition
 		moveToNextCardOrClose();
+
+		// Schedule debounced save
+		debouncedSave();
 	}
 
 	function navigateToCard() {
@@ -179,6 +222,22 @@
 
 	onDestroy(() => {
 		document.removeEventListener("keydown", handleKeydown);
+
+		// Clean up any pending saves
+		if (saveTimeout) {
+			clearTimeout(saveTimeout);
+			// Force save any pending updates before destroying
+			if (pendingUpdates.length > 0) {
+				plugin
+					.savePluginData()
+					.catch((error) =>
+						console.error(
+							"Error saving pending updates on destroy:",
+							error,
+						),
+					);
+			}
+		}
 	});
 </script>
 

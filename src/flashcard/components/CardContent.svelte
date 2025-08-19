@@ -50,19 +50,21 @@
 
 	:global(.flashcard-content-wrapper) {
 		width: 100%;
-		animation: fadeIn 0.2s ease-in-out;
+		animation: fadeIn 0.1s ease-out;
 	}
 
 	:global(.flashcard-content-wrapper > div) {
-		animation: fadeIn 0.15s ease-in-out;
+		animation: fadeIn 0.08s ease-out;
 	}
 
 	@keyframes fadeIn {
 		from {
 			opacity: 0;
+			transform: translateY(2px);
 		}
 		to {
 			opacity: 1;
+			transform: translateY(0);
 		}
 	}
 </style>
