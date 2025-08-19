@@ -192,7 +192,7 @@
 		/>
 	</div>
 
-	<div class="main-content">
+	<div class="content">
 		{#if currentFlashcard}
 			<CardContent
 				{plugin}
@@ -216,7 +216,6 @@
 <style lang="postcss">
 	.modal-inner {
 		@apply flex flex-col h-full w-full;
-		padding: 1rem 0.75rem;
 		box-sizing: border-box;
 	}
 
@@ -224,10 +223,8 @@
 		@apply w-full flex flex-col items-center justify-center mb-4 flex-shrink-0;
 	}
 
-	.main-content {
+	.content {
 		@apply flex-1 min-h-0 overflow-y-auto w-full;
-		padding: 0.5rem 1rem;
-		box-sizing: border-box;
 	}
 
 	.no-cards {
