@@ -40,7 +40,7 @@
 	let autoSaveTimer: ReturnType<typeof setTimeout> | null = null;
 
 	let resizeObserverInstance: ResizeObserver | null = null;
-	let resizeTimeout: ReturnType<typeof setTimeout> | null = null;
+	let lastResizeTime = 0;
 
 	let copiedRects: OcclusionShape[] = [];
 
@@ -421,16 +421,16 @@
 				});
 
 				resizeObserverInstance = new ResizeObserver(() => {
-					if (resizeTimeout) {
-						clearTimeout(resizeTimeout);
-					}
-
-					resizeTimeout = setTimeout(() => {
-						if (stage) {
-							resizeStage();
+					if (stage && konvaContainer) {
+						const now = performance.now();
+						// Throttle to max 60fps (16ms)
+						if (now - lastResizeTime >= 16) {
+							lastResizeTime = now;
+							requestAnimationFrame(() => {
+								resizeStage();
+							});
 						}
-						resizeTimeout = null;
-					}, 100);
+					}
 				});
 
 				resizeObserverInstance.observe(konvaContainer);
@@ -877,21 +877,14 @@
 	}
 
 	function resizeStage() {
-		if (
-			!validateContainer("resize stage") ||
-			!validateStage("resize stage")
-		) {
-			return;
-		}
+		if (!stage || !konvaContainer) return;
 
 		const containerWidth = konvaContainer.clientWidth;
 		const containerHeight = konvaContainer.clientHeight;
 
-		if (containerWidth === 0 || containerHeight === 0) {
-			console.warn("Container has zero dimensions, delaying resize");
-			return;
-		}
+		if (containerWidth <= 0 || containerHeight <= 0) return;
 
+		// Simply resize the stage to match container
 		stage.width(containerWidth);
 		stage.height(containerHeight);
 
@@ -900,32 +893,25 @@
 			const imgWidth = backgroundImage.width();
 			const imgHeight = backgroundImage.height();
 
+			// Calculate scale to fit image in container
 			const scaleX = containerWidth / imgWidth;
 			const scaleY = containerHeight / imgHeight;
 			const scale = Math.min(scaleX, scaleY);
 
+			// Center the image
 			const centerX = (containerWidth - imgWidth * scale) / 2;
 			const centerY = (containerHeight - imgHeight * scale) / 2;
 
-			stage.position({ x: 0, y: 0 });
-			stage.scale({ x: 1, y: 1 });
+			// Reset stage transform and apply new one
+			stage.position({ x: centerX, y: centerY });
+			stage.scale({ x: scale, y: scale });
 
-			stage.position({
-				x: centerX,
-				y: centerY,
-			});
-
-			stage.scale({
-				x: scale,
-				y: scale,
-			});
-
+			// Keep image at origin relative to stage
 			backgroundImage.position({ x: 0, y: 0 });
 			backgroundImage.scale({ x: 1, y: 1 });
 		}
 
 		stage.batchDraw();
-
 		refreshRectanglesAppearance();
 	}
 

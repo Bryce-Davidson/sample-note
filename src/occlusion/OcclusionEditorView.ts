@@ -52,11 +52,8 @@ export class SvelteOcclusionEditorView extends ItemView {
 	}
 
 	private onViewActivate(): void {
-		if (this.component && this.isComponentMounted) {
-			setTimeout(() => {
-				this.onResize();
-			}, 0);
-		}
+		// Component will handle its own resizing via ResizeObserver
+		// No need to trigger additional resize here
 	}
 
 	private onViewDeactivate(): void {}
@@ -90,9 +87,8 @@ export class SvelteOcclusionEditorView extends ItemView {
 
 			this.setupComponentEventListeners();
 
-			setTimeout(() => {
-				window.dispatchEvent(new Event("resize"));
-			}, 100);
+			// Let the ResizeObserver handle the initial sizing
+			// Remove redundant window resize event
 		}
 
 		this.isViewActive =
@@ -105,10 +101,7 @@ export class SvelteOcclusionEditorView extends ItemView {
 		this.component.$on("component_mounted", () => {
 			this.isComponentMounted = true;
 			console.debug("Occlusion editor component mounted");
-
-			setTimeout(() => {
-				window.dispatchEvent(new Event("resize"));
-			}, 50);
+			// ResizeObserver will handle sizing
 		});
 
 		this.component.$on("component_destroyed", () => {
@@ -145,7 +138,7 @@ export class SvelteOcclusionEditorView extends ItemView {
 	}
 
 	onResize(): void {
-		window.dispatchEvent(new Event("resize"));
+		// ResizeObserver handles all resizing automatically
 	}
 
 	private refreshView(): void {
@@ -185,9 +178,7 @@ export class SvelteOcclusionEditorView extends ItemView {
 				this.setSelectedFile(currentFilePath);
 			}
 
-			setTimeout(() => {
-				window.dispatchEvent(new Event("resize"));
-			}, 100);
+			// ResizeObserver will handle sizing
 		}
 	}
 
