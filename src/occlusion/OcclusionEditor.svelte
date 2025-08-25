@@ -532,15 +532,20 @@
 		document.removeEventListener("keyup", handleKeyUp);
 
 		if (konvaContainer) {
-			konvaContainer.removeEventListener("pointerenter", () => {
-				isCanvasFocused = true;
-			});
-			konvaContainer.removeEventListener("pointerleave", () => {
-				isCanvasFocused = false;
-			});
-			konvaContainer.removeEventListener("pointerdown", () => {
-				isCanvasFocused = true;
-			});
+			konvaContainer.removeEventListener(
+				"pointerenter",
+				containerPointerEnter,
+			);
+			konvaContainer.removeEventListener(
+				"pointerleave",
+				containerPointerLeave,
+			);
+			konvaContainer.removeEventListener(
+				"pointerdown",
+				containerPointerDown,
+			);
+			konvaContainer.removeEventListener("keydown", containerKeyDown);
+			konvaContainer.removeEventListener("keyup", containerKeyUp);
 		}
 
 		clearAutoSaveTimer();
@@ -805,17 +810,24 @@
 		});
 	}
 
+	// Store references to event listeners for cleanup
+	let containerPointerEnter: () => void;
+	let containerPointerLeave: () => void;
+	let containerPointerDown: () => void;
+	let containerKeyDown: (e: KeyboardEvent) => void;
+	let containerKeyUp: (e: KeyboardEvent) => void;
+
 	function setupContainerEventListeners() {
-		konvaContainer.addEventListener("pointerenter", () => {
+		containerPointerEnter = () => {
 			isCanvasFocused = true;
 			if (isSpacePressed) {
 				setCursorClass(isPanning ? "cursor-grabbing" : "cursor-grab");
 			} else if (clickAndDragOcclusionMode) {
 				setCursorClass("cursor-crosshair");
 			}
-		});
+		};
 
-		konvaContainer.addEventListener("pointerleave", () => {
+		containerPointerLeave = () => {
 			isCanvasFocused = false;
 			if (
 				getCurrentCursorClass() === "cursor-grab" ||
@@ -835,11 +847,32 @@
 				startPoint = null;
 				shapeLayer.draw();
 			}
-		});
+		};
 
-		konvaContainer.addEventListener("pointerdown", () => {
+		containerPointerDown = () => {
 			isCanvasFocused = true;
-		});
+		};
+
+		// Add keydown listener directly to container for additional space bar protection
+		containerKeyDown = (e: KeyboardEvent) => {
+			if (e.code === "Space") {
+				e.preventDefault();
+				e.stopPropagation();
+			}
+		};
+
+		containerKeyUp = (e: KeyboardEvent) => {
+			if (e.code === "Space") {
+				e.preventDefault();
+				e.stopPropagation();
+			}
+		};
+
+		konvaContainer.addEventListener("pointerenter", containerPointerEnter);
+		konvaContainer.addEventListener("pointerleave", containerPointerLeave);
+		konvaContainer.addEventListener("pointerdown", containerPointerDown);
+		konvaContainer.addEventListener("keydown", containerKeyDown);
+		konvaContainer.addEventListener("keyup", containerKeyUp);
 	}
 
 	function initializeKonva() {
@@ -1325,13 +1358,15 @@
 			activeElement instanceof HTMLInputElement ||
 			activeElement instanceof HTMLTextAreaElement;
 
-		if (e.code === "Space" && !isInputFocused && isCanvasFocused) {
-			if (!isSpacePressed) {
+		// Always prevent space bar bubbling when occlusion editor is active (unless in input field)
+		if (e.code === "Space" && !isInputFocused) {
+			e.preventDefault();
+			e.stopPropagation();
+
+			// Only activate panning mode if canvas is focused
+			if (isCanvasFocused && !isSpacePressed) {
 				isSpacePressed = true;
 				setCursorClass("cursor-grab");
-
-				e.preventDefault();
-				e.stopPropagation();
 			}
 			return;
 		}
@@ -1382,11 +1417,13 @@
 
 	function handleKeyUp(e: KeyboardEvent) {
 		if (e.code === "Space") {
+			// Always prevent space bar bubbling when occlusion editor is active
+			e.preventDefault();
+			e.stopPropagation();
+
 			isSpacePressed = false;
 			if (isCanvasFocused) {
 				removeCursorClasses();
-				e.preventDefault();
-				e.stopPropagation();
 			}
 		}
 	}
@@ -1837,9 +1874,13 @@
 	<!-- Main content area with relative positioning -->
 	<div class="relative flex-1">
 		<!-- Konva Container - Full height now -->
+		<!-- svelte-ignore a11y-no-noninteractive-tabindex -->
 		<div
 			class="overflow-auto absolute inset-0 bg-white border border-gray-300 dark:border-gray-600 dark:bg-gray-900"
 			bind:this={konvaContainer}
+			tabindex="0"
+			role="application"
+			aria-label="Occlusion Editor Canvas"
 		></div>
 
 		<!-- Replace the old flashcard panel with the new component -->
