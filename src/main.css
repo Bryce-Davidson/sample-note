@@ -152,9 +152,36 @@
 }
 
 .sample-note-flashcard-modal-content {
-	padding: 0.5rem 1rem;
-	height: 100%;
-	width: 100%;
+	padding: 0.5rem 1rem 0.5rem 0.5rem; /* Less right padding for close button */
+	height: calc(100% - 40px); /* Leave space for close button */
+	width: calc(100% - 40px); /* Leave space for close button */
+}
+
+/* Improve Obsidian's default modal close button */
+.sample-note-flashcard-modal .modal-close-button {
+	position: absolute !important;
+	top: 8px !important;
+	right: 8px !important;
+	z-index: 1001 !important;
+	min-width: 44px !important;
+	min-height: 44px !important;
+	padding: 10px !important;
+	border-radius: 4px !important;
+	background: transparent !important;
+	border: none !important;
+	cursor: pointer !important;
+	display: flex !important;
+	align-items: center !important;
+	justify-content: center !important;
+	/* Mobile optimizations */
+	touch-action: manipulation !important;
+	-webkit-tap-highlight-color: transparent !important;
+	transition: background-color 0.2s ease !important;
+}
+
+.sample-note-flashcard-modal .modal-close-button:hover,
+.sample-note-flashcard-modal .modal-close-button:active {
+	background-color: var(--background-modifier-hover) !important;
 }
 
 @media (max-width: 480px) {
@@ -175,6 +202,15 @@
 						env(safe-area-inset-bottom, 0px) + 2.5rem
 				)
 		);
+	}
+
+	/* Larger close button on mobile */
+	.sample-note-flashcard-modal .modal-close-button {
+		top: 12px !important;
+		right: 12px !important;
+		min-width: 48px !important;
+		min-height: 48px !important;
+		padding: 12px !important;
 	}
 }
 
