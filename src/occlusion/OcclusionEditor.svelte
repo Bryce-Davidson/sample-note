@@ -41,8 +41,13 @@
 
 	let resizeObserverInstance: ResizeObserver | null = null;
 	let lastResizeTime = 0;
+	let pendingResizeFrame: number | null = null;
 
 	let copiedRects: OcclusionShape[] = [];
+
+	// Track loading state to prevent race conditions
+	let currentLoadingPath: string | null = null;
+	let loadingAbortController: AbortController | null = null;
 
 	type OcclusionShape = {
 		x: number;
@@ -387,64 +392,13 @@
 		return null;
 	}
 
+	let unregisterFileOpen: (() => void) | null = null;
+	let unregisterFileRename: (() => void) | null = null;
+	let unsubscribeFlashcardStore: (() => void) | null = null;
+
 	onMount(() => {
-		setTimeout(() => {
-			if (konvaContainer) {
-				initializeKonva();
-				setupEventListeners();
-
-				const unsubscribe = flashcardEventStore.subscribe((event) => {
-					if (event?.type === "card_reviewed") {
-						if (
-							plugin.notes[selectedFilePath]?.cards[
-								event.cardUUID
-							]
-						) {
-							plugin.notes[selectedFilePath].cards[
-								event.cardUUID
-							] = event.cardState;
-
-							if (selectedRect) {
-								selectedOcclusioncards =
-									getFlashcardsUsingShape(selectedRect.id());
-								flashcardInfoVisible =
-									selectedOcclusioncards.length > 0;
-							}
-
-							if (
-								typeof plugin.refreshUnifiedQueue === "function"
-							) {
-								plugin.refreshUnifiedQueue();
-							}
-						}
-					}
-				});
-
-				resizeObserverInstance = new ResizeObserver(() => {
-					if (stage && konvaContainer) {
-						const now = performance.now();
-						// Throttle to max 60fps (16ms)
-						if (now - lastResizeTime >= 16) {
-							lastResizeTime = now;
-							requestAnimationFrame(() => {
-								resizeStage();
-							});
-						}
-					}
-				});
-
-				resizeObserverInstance.observe(konvaContainer);
-
-				return () => {
-					unsubscribe();
-					if (resizeObserverInstance) {
-						resizeObserverInstance.disconnect();
-					}
-				};
-			}
-		}, 50);
-
-		const unregisterFileOpen = plugin.app.workspace.on(
+		// Register Obsidian event listeners first
+		unregisterFileOpen = plugin.app.workspace.on(
 			"file-open",
 			async (file: TFile) => {
 				if (file && file instanceof TFile) {
@@ -461,7 +415,7 @@
 			},
 		);
 
-		const unregisterFileRename = plugin.app.vault.on(
+		unregisterFileRename = plugin.app.vault.on(
 			"rename",
 			(file: TFile, oldPath: string) => {
 				if (selectedFilePath === oldPath) {
@@ -470,6 +424,78 @@
 				}
 			},
 		);
+
+		setTimeout(() => {
+			if (konvaContainer) {
+				initializeKonva();
+				setupEventListeners();
+
+				unsubscribeFlashcardStore = flashcardEventStore.subscribe(
+					(event) => {
+						if (event?.type === "card_reviewed") {
+							if (
+								plugin.notes[selectedFilePath]?.cards[
+									event.cardUUID
+								]
+							) {
+								plugin.notes[selectedFilePath].cards[
+									event.cardUUID
+								] = event.cardState;
+
+								if (selectedRect) {
+									selectedOcclusioncards =
+										getFlashcardsUsingShape(
+											selectedRect.id(),
+										);
+									flashcardInfoVisible =
+										selectedOcclusioncards.length > 0;
+								}
+
+								if (
+									typeof plugin.refreshUnifiedQueue ===
+									"function"
+								) {
+									plugin.refreshUnifiedQueue();
+								}
+							}
+						}
+					},
+				);
+
+				resizeObserverInstance = new ResizeObserver(() => {
+					if (stage && konvaContainer) {
+						const now = performance.now();
+						// Throttle to max 60fps (16ms) and prevent accumulating frames
+						if (
+							now - lastResizeTime >= 16 &&
+							pendingResizeFrame === null
+						) {
+							lastResizeTime = now;
+							pendingResizeFrame = requestAnimationFrame(() => {
+								resizeStage();
+								pendingResizeFrame = null;
+							});
+						}
+					}
+				});
+
+				resizeObserverInstance.observe(konvaContainer);
+
+				return () => {
+					if (unsubscribeFlashcardStore) {
+						unsubscribeFlashcardStore();
+					}
+					if (resizeObserverInstance) {
+						resizeObserverInstance.disconnect();
+					}
+					// Cancel any pending resize frame
+					if (pendingResizeFrame !== null) {
+						cancelAnimationFrame(pendingResizeFrame);
+						pendingResizeFrame = null;
+					}
+				};
+			}
+		}, 50);
 
 		return () => {
 			if (stage) {
@@ -490,15 +516,20 @@
 			document.removeEventListener("keyup", handleKeyUp);
 
 			if (konvaContainer) {
-				konvaContainer.removeEventListener("pointerenter", () => {
-					isCanvasFocused = true;
-				});
-				konvaContainer.removeEventListener("pointerleave", () => {
-					isCanvasFocused = false;
-				});
-				konvaContainer.removeEventListener("pointerdown", () => {
-					isCanvasFocused = true;
-				});
+				konvaContainer.removeEventListener(
+					"pointerenter",
+					containerPointerEnter,
+				);
+				konvaContainer.removeEventListener(
+					"pointerleave",
+					containerPointerLeave,
+				);
+				konvaContainer.removeEventListener(
+					"pointerdown",
+					containerPointerDown,
+				);
+				konvaContainer.removeEventListener("keydown", containerKeyDown);
+				konvaContainer.removeEventListener("keyup", containerKeyUp);
 			}
 
 			clearAutoSaveTimer();
@@ -506,6 +537,14 @@
 			if (resizeObserverInstance) {
 				resizeObserverInstance.disconnect();
 				resizeObserverInstance = null;
+			}
+
+			// Clean up Obsidian event listeners
+			if (unregisterFileOpen) {
+				unregisterFileOpen();
+			}
+			if (unregisterFileRename) {
+				unregisterFileRename();
 			}
 		};
 	});
@@ -554,6 +593,33 @@
 			resizeObserverInstance.disconnect();
 			resizeObserverInstance = null;
 		}
+
+		// Cancel any pending resize frame
+		if (pendingResizeFrame !== null) {
+			cancelAnimationFrame(pendingResizeFrame);
+			pendingResizeFrame = null;
+		}
+
+		// Clean up Obsidian event listeners
+		if (unregisterFileOpen) {
+			unregisterFileOpen();
+			unregisterFileOpen = null;
+		}
+		if (unregisterFileRename) {
+			unregisterFileRename();
+			unregisterFileRename = null;
+		}
+		if (unsubscribeFlashcardStore) {
+			unsubscribeFlashcardStore();
+			unsubscribeFlashcardStore = null;
+		}
+
+		// Cancel any pending image load operations
+		if (loadingAbortController) {
+			loadingAbortController.abort();
+			loadingAbortController = null;
+		}
+		currentLoadingPath = null;
 	});
 
 	function createTransformer(): Konva.Transformer {
@@ -958,6 +1024,26 @@
 				return;
 			}
 
+			// Cancel any existing load operation
+			if (loadingAbortController) {
+				loadingAbortController.abort();
+			}
+
+			// Check if we're already loading this path
+			if (currentLoadingPath === filePath) {
+				return;
+			}
+
+			// Set up new loading operation
+			currentLoadingPath = filePath;
+			loadingAbortController = new AbortController();
+			const signal = loadingAbortController.signal;
+
+			// Check if operation was cancelled before we start
+			if (signal.aborted) {
+				return;
+			}
+
 			imageLayer.destroyChildren();
 			shapeLayer.destroyChildren();
 
@@ -975,6 +1061,11 @@
 				return;
 			}
 
+			// Check if operation was cancelled before async operation
+			if (signal.aborted) {
+				return;
+			}
+
 			const data = await plugin.app.vault.readBinary(file);
 			const blob = new Blob([data]);
 			const url = URL.createObjectURL(blob);
@@ -982,8 +1073,28 @@
 			const img = new Image();
 
 			await new Promise<void>((resolve, reject) => {
+				// Set up abort handler
+				const abortHandler = () => {
+					URL.revokeObjectURL(url);
+					reject(new Error("Load operation was cancelled"));
+				};
+
+				if (signal.aborted) {
+					abortHandler();
+					return;
+				}
+
+				signal.addEventListener("abort", abortHandler);
+
 				img.onload = () => {
 					try {
+						// Check if operation was cancelled during image load
+						if (signal.aborted) {
+							URL.revokeObjectURL(url);
+							reject(new Error("Load operation was cancelled"));
+							return;
+						}
+
 						const nativeWidth = img.naturalWidth;
 						const nativeHeight = img.naturalHeight;
 
@@ -1000,8 +1111,14 @@
 						imageLayer.batchDraw();
 
 						requestAnimationFrame(() => {
-							resizeStage();
-							loadSavedShapes(filePath);
+							// Final check before completing
+							if (
+								!signal.aborted &&
+								currentLoadingPath === filePath
+							) {
+								resizeStage();
+								loadSavedShapes(filePath);
+							}
 						});
 
 						resolve();
@@ -1009,18 +1126,28 @@
 						reject(err);
 					} finally {
 						URL.revokeObjectURL(url);
+						signal.removeEventListener("abort", abortHandler);
 					}
 				};
 
 				img.onerror = (error) => {
 					URL.revokeObjectURL(url);
+					signal.removeEventListener("abort", abortHandler);
 					reject(new Error(`Failed to load image: ${error}`));
 				};
 
 				img.src = url;
 			});
 		} catch (error) {
-			console.error(`Error load image: ${error.message || error}`);
+			if (error.message !== "Load operation was cancelled") {
+				console.error(`Error load image: ${error.message || error}`);
+			}
+		} finally {
+			// Clear loading state if this was the current operation
+			if (currentLoadingPath === filePath) {
+				currentLoadingPath = null;
+				loadingAbortController = null;
+			}
 		}
 	}
 
@@ -1575,22 +1702,28 @@
 
 		hasUnsavedChanges = true;
 
-		plugin.savePluginData().then(() => {
-			new Notice(`${mode} flashcard created for ${fileName}`);
+		plugin
+			.savePluginData()
+			.then(() => {
+				new Notice(`${mode} flashcard created for ${fileName}`);
 
-			refreshRectanglesAppearance();
+				refreshRectanglesAppearance();
 
-			if (selectedRect) {
-				selectedOcclusioncards = getFlashcardsUsingShape(
-					selectedRect.id(),
-				);
-				flashcardInfoVisible = selectedOcclusioncards.length > 0;
-			}
+				if (selectedRect) {
+					selectedOcclusioncards = getFlashcardsUsingShape(
+						selectedRect.id(),
+					);
+					flashcardInfoVisible = selectedOcclusioncards.length > 0;
+				}
 
-			if (typeof plugin.refreshUnifiedQueue === "function") {
-				plugin.refreshUnifiedQueue();
-			}
-		});
+				if (typeof plugin.refreshUnifiedQueue === "function") {
+					plugin.refreshUnifiedQueue();
+				}
+			})
+			.catch((error: unknown) => {
+				console.error("Error creating flashcard:", error);
+				new Notice("Error creating flashcard. Please try again.");
+			});
 	}
 
 	function handleSaveButtonClick() {
@@ -1675,22 +1808,29 @@
 
 		if (plugin.notes[selectedFilePath].cards[cardUUID]) {
 			delete plugin.notes[selectedFilePath].cards[cardUUID];
-			plugin.savePluginData().then(() => {
-				new Notice("Flashcard deleted");
+			plugin
+				.savePluginData()
+				.then(() => {
+					new Notice("Flashcard deleted");
 
-				if (selectedRect) {
-					selectedOcclusioncards = getFlashcardsUsingShape(
-						selectedRect.id(),
-					);
-					flashcardInfoVisible = selectedOcclusioncards.length > 0;
-				}
+					if (selectedRect) {
+						selectedOcclusioncards = getFlashcardsUsingShape(
+							selectedRect.id(),
+						);
+						flashcardInfoVisible =
+							selectedOcclusioncards.length > 0;
+					}
 
-				refreshRectanglesAppearance();
+					refreshRectanglesAppearance();
 
-				if (typeof plugin.refreshUnifiedQueue === "function") {
-					plugin.refreshUnifiedQueue();
-				}
-			});
+					if (typeof plugin.refreshUnifiedQueue === "function") {
+						plugin.refreshUnifiedQueue();
+					}
+				})
+				.catch((error: unknown) => {
+					console.error("Error deleting flashcard:", error);
+					new Notice("Error deleting flashcard. Please try again.");
+				});
 		}
 	}
 

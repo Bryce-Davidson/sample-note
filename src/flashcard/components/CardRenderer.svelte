@@ -119,6 +119,11 @@
 							filePath: flashcard.filePath,
 							line: flashcard.line,
 						};
+						// Clean up the component on error to prevent memory leak
+						if (currentComponent) {
+							currentComponent.$destroy();
+							currentComponent = null;
+						}
 						tempContainer.remove();
 						isRendering = false;
 					},
@@ -178,6 +183,11 @@
 				line: flashcard.line,
 				cardTitle: flashcard.cardTitle,
 			};
+			// Clean up the component on error to prevent memory leak
+			if (currentComponent) {
+				currentComponent.$destroy();
+				currentComponent = null;
+			}
 			tempContainer.remove();
 		} finally {
 			isRendering = false;

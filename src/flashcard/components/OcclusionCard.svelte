@@ -237,6 +237,28 @@
 
 		const aspectRatio = img.naturalHeight / img.naturalWidth;
 
+		// Store original shape data to prevent cumulative scaling
+		const originalShapeData: Array<{
+			shape: Konva.Rect;
+			x: number;
+			y: number;
+			width: number;
+			height: number;
+		}> = [];
+
+		// Capture original shape dimensions
+		shapeLayer.getChildren().forEach((shape: Konva.Node) => {
+			if (shape instanceof Konva.Rect) {
+				originalShapeData.push({
+					shape,
+					x: shape.x(),
+					y: shape.y(),
+					width: shape.width(),
+					height: shape.height(),
+				});
+			}
+		});
+
 		resizeObserver = new ResizeObserver(() => {
 			try {
 				if (!stage || !stageContainer) return;
@@ -255,17 +277,16 @@
 				kImage.width(newWidth);
 				kImage.height(newHeight);
 
-				const scaleFactorX = newWidth / originalWidth;
-				const scaleFactorY = newHeight / originalHeight;
+				// Calculate scale factors from original image dimensions
+				const scaleFactorX = newWidth / img.naturalWidth;
+				const scaleFactorY = newHeight / img.naturalHeight;
 
-				const shapes = shapeLayer.getChildren();
-				shapes.forEach((shape: Konva.Node) => {
-					if (shape instanceof Konva.Rect) {
-						shape.x(shape.x() * scaleFactorX);
-						shape.y(shape.y() * scaleFactorY);
-						shape.width(shape.width() * scaleFactorX);
-						shape.height(shape.height() * scaleFactorY);
-					}
+				// Apply scaling from original dimensions to prevent cumulative scaling
+				originalShapeData.forEach(({ shape, x, y, width, height }) => {
+					shape.x(x * scaleFactorX);
+					shape.y(y * scaleFactorY);
+					shape.width(width * scaleFactorX);
+					shape.height(height * scaleFactorY);
 				});
 
 				imageLayer.draw();
