@@ -204,6 +204,15 @@
 		);
 	}
 
+	/* Allow content to use full width, close button floats above */
+	.sample-note-flashcard-modal-content {
+		padding: 0.75rem; /* Equal padding on all sides */
+		padding-top: 4rem; /* Top padding to clear the close button */
+		height: calc(100% - 4.75rem); /* Account for top padding */
+		width: 100%; /* Full width available */
+		box-sizing: border-box;
+	}
+
 	/* Larger close button on mobile */
 	.sample-note-flashcard-modal .modal-close-button {
 		top: 12px !important;
