@@ -83,7 +83,7 @@ export class FlashcardManager {
 	async showFlashcardsModal() {
 		const activeFile = this.plugin.app.workspace.getActiveFile();
 		if (!activeFile) {
-			new Notice("No active file open.");
+			console.info("No active file open; cannot show flashcards modal.");
 			return;
 		}
 		let flashcards = await this.syncFlashcardsForFile(activeFile);
@@ -127,15 +127,13 @@ export class FlashcardManager {
 				true
 			).open();
 		} else {
-			new Notice(
+			console.info(
 				"No flashcards found in this file. Create flashcards using [card] and [/card] tags."
 			);
 		}
 	}
 
 	async showAllDueFlashcardsModal() {
-		const loadingNotice = new Notice("Preparing flashcards...", 0);
-
 		try {
 			const now = new Date();
 
@@ -184,9 +182,8 @@ export class FlashcardManager {
 				}
 
 				if (cardMetadata.length > 0) {
-					new Notice(
-						"No due flashcards; starting scheduled flashcards review.",
-						3000
+					console.info(
+						"No due flashcards; starting scheduled flashcards review."
 					);
 				}
 			}
@@ -207,8 +204,6 @@ export class FlashcardManager {
 			}
 
 			if (cardMetadata.length === 0) {
-				loadingNotice.hide();
-				new Notice("No flashcards due or scheduled for review.");
 				return;
 			}
 
@@ -279,8 +274,6 @@ export class FlashcardManager {
 				},
 			};
 
-			loadingNotice.hide();
-
 			if (initialBatch.length > 0) {
 				createFlashcardModal(
 					this.plugin.app,
@@ -291,13 +284,15 @@ export class FlashcardManager {
 					loaderProxy as any
 				).open();
 			} else {
-				new Notice("No flashcards due or scheduled for review.");
+				return;
 			}
 		} catch (error) {
-			loadingNotice.hide();
 			const errorMessage = formatFlashcardLoadError(error);
-			new Notice(errorMessage);
-			console.error("Error in showAllDueFlashcardsModal:", error);
+			console.error(
+				"Error in showAllDueFlashcardsModal:",
+				errorMessage,
+				error
+			);
 		}
 	}
 
@@ -434,25 +429,12 @@ export class FlashcardManager {
 							)
 						) {
 							newCardAdded = true;
-							const contentOrTitleChanged =
-								existingCard.cardContent !==
-									flashcard.content ||
-								existingCard.cardTitle !== flashcard.cardTitle;
-
 							updateExistingCard(
 								existingCard,
 								flashcard.content,
 								flashcard.cardTitle,
 								flashcard.line
 							);
-
-							if (contentOrTitleChanged) {
-								new Notice(
-									`Flashcard "${truncateCardTitle(
-										flashcard.cardTitle
-									)}" updated.`
-								);
-							}
 						}
 					}
 
@@ -496,12 +478,6 @@ export class FlashcardManager {
 									)
 								) {
 									newCardAdded = true;
-									const contentOrTitleChanged =
-										existingChildCard.cardContent !==
-											flashcard.content ||
-										existingChildCard.cardTitle !==
-											childTitle;
-
 									updateExistingCard(
 										existingChildCard,
 										flashcard.content,
@@ -509,15 +485,6 @@ export class FlashcardManager {
 										flashcard.line,
 										groupId
 									);
-
-									if (contentOrTitleChanged) {
-										new Notice(
-											`Hide group flashcard "${truncateCardTitle(
-												flashcard.cardTitle,
-												15
-											)} (Group ${groupId})" updated.`
-										);
-									}
 								}
 							}
 						});
@@ -563,7 +530,7 @@ export class FlashcardManager {
 
 			let errorMessage = formatSyncErrorMessage(error, file.name);
 
-			new Notice(errorMessage);
+			console.error("Flashcard sync error message:", errorMessage);
 			return [];
 		}
 	}
@@ -582,8 +549,8 @@ export class FlashcardManager {
 		startTag: string | RegExp,
 		endTag: string | RegExp,
 		entireDocument: boolean = false,
-		successMessage: string = "Removed wrappers.",
-		failMessage: string = "No matching wrappers found."
+		_successMessage: string = "Removed wrappers.",
+		_failMessage: string = "No matching wrappers found."
 	) {
 		if (entireDocument) {
 			const content = editor.getValue();
@@ -604,9 +571,8 @@ export class FlashcardManager {
 
 			if (content !== updatedContent) {
 				editor.setValue(updatedContent);
-				new Notice(successMessage);
 			} else {
-				new Notice(failMessage);
+				console.info("No matching wrappers found to remove.");
 			}
 			return;
 		}
@@ -657,7 +623,9 @@ export class FlashcardManager {
 		}
 
 		if (!foundStart || !foundEnd) {
-			new Notice(failMessage);
+			console.info(
+				"No matching wrappers found to remove around the cursor."
+			);
 			return;
 		}
 
@@ -679,8 +647,6 @@ export class FlashcardManager {
 				? cursorOffset - foundStart.match.length
 				: cursorOffset;
 		editor.setCursor(editor.offsetToPos(newCursorOffset));
-
-		new Notice(successMessage);
 	}
 
 	private escapeRegExp(string: string): string {
@@ -825,7 +791,7 @@ export class FlashcardManager {
 		}
 
 		if (!targetMatch) {
-			new Notice("Cursor is not within a math block.");
+			console.info("Cursor is not within a math block.");
 			return;
 		}
 
@@ -833,7 +799,7 @@ export class FlashcardManager {
 
 		const equalIndex = mathContent.indexOf("=");
 		if (equalIndex === -1) {
-			new Notice("Math block does not contain an equals sign.");
+			console.info("Math block does not contain an equals sign.");
 			return;
 		}
 
@@ -847,7 +813,7 @@ export class FlashcardManager {
 
 		editor.replaceRange(replacement, startPos, endPos);
 
-		new Notice("Math block split on equals sign.");
+		console.info("Math block split on equals sign.");
 	}
 
 	public refreshUnifiedQueue(): void {
