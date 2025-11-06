@@ -16,6 +16,8 @@ export interface CardState {
 	occlusionData?: OcclusionData;
 	parentCardUUID?: string;
 	hideGroupId?: string;
+	contentVersion?: number;
+	lastReviewedVersion?: number;
 }
 
 export interface EfHistoryEntry {

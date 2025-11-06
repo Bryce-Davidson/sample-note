@@ -30,10 +30,22 @@
 
 	const displayTitle =
 		cardState.cardTitle || (file instanceof TFile ? file.basename : "");
+
+	$: contentVersion =
+		typeof cardState?.contentVersion === "number"
+			? cardState.contentVersion
+			: undefined;
+	$: lastReviewedVersion =
+		typeof cardState?.lastReviewedVersion === "number"
+			? cardState.lastReviewedVersion
+			: contentVersion;
+	$: showUpdatedBadge =
+		typeof contentVersion === "number" &&
+		(lastReviewedVersion ?? contentVersion) < contentVersion;
 </script>
 
 <div
-	class="relative flex flex-col w-full p-5 text-left bg-white border border-gray-200 rounded-lg shadow-sm cursor-pointer dark:bg-gray-800 dark:border-gray-700"
+	class="flex relative flex-col p-5 w-full text-left bg-white rounded-lg border border-gray-200 shadow-sm cursor-pointer dark:bg-gray-800 dark:border-gray-700"
 	role="button"
 	tabindex="0"
 	on:click={handleCardNavigation}
@@ -44,19 +56,32 @@
 		}
 	}}
 >
-	<div class="flex items-center justify-between">
+	<div class="flex justify-between items-center">
 		<h3
 			class="py-0 my-0 text-lg font-medium text-gray-900 truncate dark:text-gray-100"
 			title={displayTitle}
 		>
 			{displayTitle}
 		</h3>
-		{#if cardState.hideGroupId}
-			<span
-				class="inline-flex items-center px-1 py-1 text-xs font-medium text-green-700 bg-green-100 rounded-md dark:bg-green-700 dark:text-green-100 whitespace-nowrap"
-			>
-				Group {cardState.hideGroupId}
-			</span>
+		{#if showUpdatedBadge || cardState.hideGroupId}
+			<div class="flex gap-2 items-center">
+				{#if showUpdatedBadge}
+					<span
+						class="inline-flex w-2.5 h-2.5 bg-amber-400 rounded-full dark:bg-amber-300"
+						title="Card content changed since your last review"
+						role="img"
+						aria-label="Card content changed since your last review"
+					>
+					</span>
+				{/if}
+				{#if cardState.hideGroupId}
+					<span
+						class="inline-flex items-center px-1 py-1 text-xs font-medium text-green-700 whitespace-nowrap bg-green-100 rounded-md dark:bg-green-700 dark:text-green-100"
+					>
+						Group {cardState.hideGroupId}
+					</span>
+				{/if}
+			</div>
 		{/if}
 	</div>
 
@@ -77,7 +102,7 @@
 	</div>
 
 	<button
-		class="p-1.5 rounded-lg flex items-center justify-center text-white bg-indigo-600 dark:bg-indigo-500 shadow-none absolute w-7 h-7 bottom-3 right-3"
+		class="flex absolute right-3 bottom-3 justify-center items-center p-1.5 w-7 h-7 text-white bg-indigo-600 rounded-lg shadow-none dark:bg-indigo-500"
 		aria-label="Review flashcard"
 		on:click|stopPropagation|preventDefault={() => {
 			const flashcard = {

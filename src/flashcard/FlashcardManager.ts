@@ -367,6 +367,16 @@ export class FlashcardManager {
 			}
 
 			const fileCards = this.plugin.notes[file.path].cards;
+			for (const existingCardUUID in fileCards) {
+				const existingCardState = fileCards[existingCardUUID];
+				if (typeof existingCardState.contentVersion !== "number") {
+					existingCardState.contentVersion = 1;
+				}
+				if (typeof existingCardState.lastReviewedVersion !== "number") {
+					existingCardState.lastReviewedVersion =
+						existingCardState.contentVersion;
+				}
+			}
 			let newCardAdded = false;
 			const allValidChildCardUUIDs: string[] = [];
 			let contentModified = false;
@@ -867,6 +877,8 @@ function createDefaultCardState(
 		],
 		cardTitle: title,
 		line,
+		contentVersion: 1,
+		lastReviewedVersion: 1,
 		...(parentCardUUID && { parentCardUUID }),
 		...(hideGroupId && { hideGroupId }),
 	};
@@ -904,6 +916,14 @@ function updateExistingCard(
 	newLine: number | undefined,
 	hideGroupId?: string
 ): void {
+	const currentVersion =
+		typeof existingCard.contentVersion === "number"
+			? existingCard.contentVersion
+			: 1;
+	if (typeof existingCard.lastReviewedVersion !== "number") {
+		existingCard.lastReviewedVersion = currentVersion;
+	}
+	existingCard.contentVersion = currentVersion + 1;
 	existingCard.cardContent = newContent;
 	existingCard.cardTitle = newTitle;
 	existingCard.line = newLine;
@@ -1050,12 +1070,18 @@ export function updateCardState(
 	stopScheduling: boolean = false
 ): CardState {
 	const updatedCard = { ...card };
+	const resolvedContentVersion =
+		typeof updatedCard.contentVersion === "number"
+			? updatedCard.contentVersion
+			: 1;
+	updatedCard.contentVersion = resolvedContentVersion;
 
 	if (stopScheduling) {
 		updatedCard.active = false;
 		updatedCard.isLearning = false;
 		updatedCard.learningStep = undefined;
 		updatedCard.nextReviewDate = new Date().toISOString();
+		updatedCard.lastReviewedVersion = updatedCard.contentVersion;
 		return updatedCard;
 	}
 
@@ -1121,6 +1147,7 @@ export function updateCardState(
 			rating: rating,
 		},
 	];
+	updatedCard.lastReviewedVersion = updatedCard.contentVersion;
 
 	return updatedCard;
 }

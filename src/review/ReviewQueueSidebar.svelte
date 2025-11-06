@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { TFile, Notice } from "obsidian";
+    import { TFile, Notice } from "obsidian";
 	import {
 		addMinutes,
 		BATCH_SIZE,
@@ -16,6 +16,7 @@
 	import Card from "./components/Card.svelte";
 	import FilterRow from "./components/FilterRow.svelte";
 	import DeckGrid from "./components/DeckGrid.svelte";
+    import { flashcardEventStore } from "../flashcard/FlashcardEventStore";
 
 	export let plugin: SampleNotePlugin;
 
@@ -117,11 +118,20 @@
 		return new Set(Array.from(tempTags).sort());
 	}
 
-	onMount(() => {
+    onMount(() => {
 		if (plugin && plugin.notes) {
 			uniqueTagsSet = collectUniqueTags();
 		}
 		renderUnifiedCards();
+
+        const unsubscribeFlashcardEvents = flashcardEventStore.subscribe(
+            (event) => {
+                if (event?.type === "card_reviewed") {
+                    cardMetaCache.clear();
+                    renderUnifiedCards();
+                }
+            },
+        );
 
 		const unregisterFileOpen = plugin.app.workspace.on(
 			"file-open",
@@ -181,11 +191,12 @@
 			},
 		);
 
-		return () => {
+        return () => {
 			plugin.app.workspace.offref(unregisterFileOpen);
 			plugin.app.vault.offref(unregisterModify);
 			plugin.app.vault.offref(unregisterDelete);
 			plugin.app.vault.offref(unregisterRename);
+            unsubscribeFlashcardEvents();
 		};
 	});
 
