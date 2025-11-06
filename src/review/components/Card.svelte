@@ -67,11 +67,10 @@
 			<div class="flex gap-2 items-center">
 				{#if showUpdatedBadge}
 					<span
-						class="inline-flex w-2.5 h-2.5 bg-amber-400 rounded-full dark:bg-amber-300"
+						class="inline-flex items-center px-1.5 py-0.5 text-xs font-medium text-amber-800 whitespace-nowrap bg-amber-100 rounded-md dark:bg-amber-900/70 dark:text-amber-200"
 						title="Card content changed since your last review"
-						role="img"
-						aria-label="Card content changed since your last review"
 					>
+						Updated
 					</span>
 				{/if}
 				{#if cardState.hideGroupId}
