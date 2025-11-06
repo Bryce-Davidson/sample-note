@@ -392,6 +392,26 @@
 		return null;
 	}
 
+	function isEditableTarget(element: Element | null): boolean {
+		if (!element) return false;
+		if (
+			element instanceof HTMLInputElement ||
+			element instanceof HTMLTextAreaElement
+		) {
+			return true;
+		}
+		if (element instanceof HTMLElement) {
+			if (element.isContentEditable) {
+				return true;
+			}
+			const editableParent = element.closest("[contenteditable='true']");
+			if (editableParent) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	let unregisterFileOpen: (() => void) | null = null;
 	let unregisterFileRename: (() => void) | null = null;
 	let unsubscribeFlashcardStore: (() => void) | null = null;
@@ -512,9 +532,6 @@
 				transformer.off("transformend");
 			}
 
-			document.removeEventListener("keydown", handleKeyDown);
-			document.removeEventListener("keyup", handleKeyUp);
-
 			if (konvaContainer) {
 				konvaContainer.removeEventListener(
 					"pointerenter",
@@ -566,9 +583,6 @@
 			transformer.off("transform");
 			transformer.off("transformend");
 		}
-
-		document.removeEventListener("keydown", handleKeyDown);
-		document.removeEventListener("keyup", handleKeyUp);
 
 		if (konvaContainer) {
 			konvaContainer.removeEventListener(
@@ -919,19 +933,13 @@
 			isCanvasFocused = true;
 		};
 
-		// Add keydown listener directly to container for additional space bar protection
+		// Add keydown listener directly to container
 		containerKeyDown = (e: KeyboardEvent) => {
-			if (e.code === "Space") {
-				e.preventDefault();
-				e.stopPropagation();
-			}
+			handleKeyDown(e);
 		};
 
 		containerKeyUp = (e: KeyboardEvent) => {
-			if (e.code === "Space") {
-				e.preventDefault();
-				e.stopPropagation();
-			}
+			handleKeyUp(e);
 		};
 
 		konvaContainer.addEventListener("pointerenter", containerPointerEnter);
@@ -963,9 +971,6 @@
 	}
 
 	function setupEventListeners() {
-		document.addEventListener("keydown", handleKeyDown);
-		document.addEventListener("keyup", handleKeyUp);
-
 		setupContainerEventListeners();
 		setupStageEventListeners();
 	}
@@ -1481,77 +1486,86 @@
 
 	function handleKeyDown(e: KeyboardEvent) {
 		const activeElement = document.activeElement;
-		const isInputFocused =
-			activeElement instanceof HTMLInputElement ||
-			activeElement instanceof HTMLTextAreaElement;
+		const isInputFocused = isEditableTarget(activeElement);
 
-		// Always prevent space bar bubbling when occlusion editor is active (unless in input field)
-		if (e.code === "Space" && !isInputFocused) {
+		// Don't capture any keyboard events if user is typing in an input field
+		if (isInputFocused) {
+			return;
+		}
+
+		// Handle space bar for panning
+		if (e.code === "Space") {
 			e.preventDefault();
 			e.stopPropagation();
 
-			// Only activate panning mode if canvas is focused
-			if (isCanvasFocused && !isSpacePressed) {
+			if (!isSpacePressed) {
 				isSpacePressed = true;
-				setCursorClass("cursor-grab");
+				if (isCanvasFocused) {
+					setCursorClass("cursor-grab");
+				}
 			}
 			return;
 		}
 
-		if (e.key.toLowerCase() === "d" && !isInputFocused && isCanvasFocused) {
+		// Handle 'D' key for click-and-drag mode
+		if (e.key.toLowerCase() === "d") {
 			e.preventDefault();
 			toggleClickAndDragOcclusionMode();
 			return;
 		}
 
-		if (!isInputFocused && isCanvasFocused) {
-			if (
-				(e.key === "Backspace" || e.key === "Delete") &&
-				selectedRects.length > 0
-			) {
-				e.preventDefault();
-				deleteSelectedRects();
-			}
+		// Handle delete/backspace
+		if (
+			(e.key === "Backspace" || e.key === "Delete") &&
+			selectedRects.length > 0
+		) {
+			e.preventDefault();
+			deleteSelectedRects();
+		}
 
-			if (
-				e.key === "c" &&
-				(e.metaKey || e.ctrlKey) &&
-				selectedRects.length > 0
-			) {
-				e.preventDefault();
-				copySelectedRects();
-			}
+		// Handle copy
+		if (
+			e.key === "c" &&
+			(e.metaKey || e.ctrlKey) &&
+			selectedRects.length > 0
+		) {
+			e.preventDefault();
+			copySelectedRects();
+		}
 
-			if (e.key === "v" && (e.metaKey || e.ctrlKey)) {
-				e.preventDefault();
-				pasteRects();
-			}
+		// Handle paste
+		if (e.key === "v" && (e.metaKey || e.ctrlKey)) {
+			e.preventDefault();
+			pasteRects();
+		}
 
-			if (e.key === "z" && (e.metaKey || e.ctrlKey) && !e.shiftKey) {
-				e.preventDefault();
-				undo();
-			}
+		// Handle undo
+		if (e.key === "z" && (e.metaKey || e.ctrlKey) && !e.shiftKey) {
+			e.preventDefault();
+			undo();
+		}
 
-			if (
-				(e.key === "z" && (e.metaKey || e.ctrlKey) && e.shiftKey) ||
-				(e.key === "y" && (e.metaKey || e.ctrlKey))
-			) {
-				e.preventDefault();
-				redo();
-			}
+		// Handle redo
+		if (
+			(e.key === "z" && (e.metaKey || e.ctrlKey) && e.shiftKey) ||
+			(e.key === "y" && (e.metaKey || e.ctrlKey))
+		) {
+			e.preventDefault();
+			redo();
 		}
 	}
 
 	function handleKeyUp(e: KeyboardEvent) {
-		if (e.code === "Space") {
-			// Always prevent space bar bubbling when occlusion editor is active
-			e.preventDefault();
-			e.stopPropagation();
+		if (e.code !== "Space" || !isSpacePressed) {
+			return;
+		}
 
-			isSpacePressed = false;
-			if (isCanvasFocused) {
-				removeCursorClasses();
-			}
+		e.preventDefault();
+		e.stopPropagation();
+
+		isSpacePressed = false;
+		if (isCanvasFocused) {
+			removeCursorClasses();
 		}
 	}
 
@@ -2019,6 +2033,7 @@
 			class="overflow-auto absolute inset-0 bg-white border border-gray-300 dark:border-gray-600 dark:bg-gray-900"
 			bind:this={konvaContainer}
 			tabindex="0"
+			style="outline:none;"
 			role="application"
 			aria-label="Occlusion Editor Canvas"
 		></div>

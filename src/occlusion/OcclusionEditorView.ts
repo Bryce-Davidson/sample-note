@@ -82,6 +82,7 @@ export class SvelteOcclusionEditorView extends ItemView {
 				target: componentContainer,
 				props: {
 					plugin: this.plugin,
+					selectedFilePath: this.selectedFilePath ?? "",
 				},
 			});
 
@@ -91,8 +92,9 @@ export class SvelteOcclusionEditorView extends ItemView {
 			// Remove redundant window resize event
 		}
 
-		this.isViewActive =
-			this.leaf.view === this.app.workspace.getActiveViewOfType(ItemView);
+		this.handleViewActiveChange(
+			this.leaf.view === this.app.workspace.getActiveViewOfType(ItemView)
+		);
 	}
 
 	private setupComponentEventListeners(): void {
@@ -169,6 +171,7 @@ export class SvelteOcclusionEditorView extends ItemView {
 				target: componentContainer,
 				props: {
 					plugin: this.plugin,
+					selectedFilePath: this.selectedFilePath ?? "",
 				},
 			});
 
