@@ -470,12 +470,6 @@ export class FlashcardManager {
 										cardUUID,
 										groupId
 									);
-								new Notice(
-									`Hide group flashcard "${truncateCardTitle(
-										flashcard.cardTitle,
-										15
-									)} (Group ${groupId})" created.`
-								);
 							} else {
 								const existingChildCard =
 									fileCards[childCardUUID];
