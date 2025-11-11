@@ -131,6 +131,7 @@
 									opacity: 1.0,
 									cornerRadius: 2,
 									perfectDrawEnabled: false,
+									id: shape.id,
 								});
 
 								if (isInCardState) {
@@ -169,6 +170,7 @@
 									opacity: 1.0,
 									cornerRadius: 2,
 									perfectDrawEnabled: false,
+									id: shape.id,
 								});
 
 								rect.on("click tap", (e) => {
@@ -237,7 +239,7 @@
 
 		const aspectRatio = img.naturalHeight / img.naturalWidth;
 
-		// Store original shape data to prevent cumulative scaling
+		// Store original unscaled shape data to prevent cumulative scaling
 		const originalShapeData: Array<{
 			shape: Konva.Rect;
 			x: number;
@@ -246,16 +248,50 @@
 			height: number;
 		}> = [];
 
-		// Capture original shape dimensions
+		// Get the original occlusion data (unscaled coordinates)
+		let allOcclusions: OcclusionShape[] = [];
+		if (
+			flashcard.filePath &&
+			plugin.notes[flashcard.filePath]?.data?.occlusion
+		) {
+			allOcclusions =
+				plugin.notes[flashcard.filePath].data.occlusion ?? [];
+		}
+
+		// Create a map of shape ID to original occlusion data for fast lookup
+		const occlusionMap = new Map<string, OcclusionShape>();
+		allOcclusions.forEach((occlusion) => {
+			if (occlusion.id) {
+				occlusionMap.set(occlusion.id, occlusion);
+			}
+		});
+
+		// Map each Konva shape to its original unscaled coordinates using ID matching
 		shapeLayer.getChildren().forEach((shape: Konva.Node) => {
 			if (shape instanceof Konva.Rect) {
-				originalShapeData.push({
-					shape,
-					x: shape.x(),
-					y: shape.y(),
-					width: shape.width(),
-					height: shape.height(),
-				});
+				const shapeId = shape.id();
+				const originalShape = occlusionMap.get(shapeId);
+
+				if (originalShape) {
+					originalShapeData.push({
+						shape,
+						x: originalShape.x,
+						y: originalShape.y,
+						width: originalShape.width,
+						height: originalShape.height,
+					});
+				} else {
+					// Fallback: use current scaled coordinates divided by current scale
+					const currentScaleX = originalWidth / img.naturalWidth;
+					const currentScaleY = originalHeight / img.naturalHeight;
+					originalShapeData.push({
+						shape,
+						x: shape.x() / currentScaleX,
+						y: shape.y() / currentScaleY,
+						width: shape.width() / currentScaleX,
+						height: shape.height() / currentScaleY,
+					});
+				}
 			}
 		});
 
